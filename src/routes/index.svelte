@@ -35,48 +35,48 @@
     <div>
     
       <!-- Some Texts -->
-      <div class="w-full text-center px-4 md:px-8 lg:px-16">
-        <h1 class="font-semibold text-3xl text-white">Connect your PCs and Phones</h1>
-        <p class="text-sm text-gray-200">Connect your computers and phones for the most convenient, fast and secure data transfer between all of them.</p>
+      <div class="w-full text-center px-8 lg:px-16">
+        <h1 class="font-semibold text-5xl md:text-3xl text-white">Connect your PCs and Phones</h1>
+        <p class="text-base md:text-sm text-gray-100">Connect your computers and phones for the most convenient, fast and secure data transfer between all of them.</p>
       </div>
 
       <!-- Icons -->
       <div class="mt-8 w-full flex flex-wrap justify-center">
         <!-- Fully Free -->
         <div class="flex flex-col items-center">
-          <div class="w-24 h-24 mx-8 bg-white rounded-lg flex flex-col items-center justify-center">
+          <div class="w-24 h-24 mx-4 md:mx-8 my-4 md:my-0 bg-white rounded-lg flex flex-col items-center justify-center">
             <img style="width: 3rem;" src="./icons/money-with-wings.png" alt="">
           </div>
 
           <!-- Text -->
           <div class="text-center mt-4">
-            <h1 class="text-white">Fully free</h1>
+            <h1 class="text-white text-sm md:text-base">Fully free</h1>
             <p class="text-xs text-gray-200"></p>
           </div>
         </div>
 
         <!-- No Registration -->
         <div class="flex flex-col items-center">
-          <div class="w-24 h-24 mx-8 bg-white rounded-lg flex flex-col items-center justify-center">
+          <div class="w-24 h-24 mx-4 md:mx-8 my-4 md:my-0 bg-white rounded-lg flex flex-col items-center justify-center">
             <img style="width: 3rem;" src="./icons/incoming-envelope.png" alt="">
           </div>
 
           <!-- Text -->
           <div class="text-center mt-4">
-            <h1 class="text-white">No Registration</h1>
+            <h1 class="text-white text-sm md:text-base">No Registration</h1>
             <p class="text-xs text-gray-200"></p>
           </div>
         </div>
 
         <!-- Community Powered -->
         <div class="flex flex-col items-center">
-          <div class="w-24 mx-8 h-24 bg-white rounded-lg flex flex-col items-center justify-center">
+          <div class="w-24 mx-4 md:mx-8 my-4 md:my-0 h-24 bg-white rounded-lg flex flex-col items-center justify-center">
             <img style="width: 3rem;" src="./icons/unicorn-face.png" alt="">
           </div>
 
           <!-- Text -->
           <div class="text-center mt-4">
-            <h1 class="text-white">Community Powered</h1>
+            <h1 class="text-white text-sm md:text-base">Community Powered</h1>
             <p class="text-xs text-gray-200"></p>
           </div>
         </div>
@@ -86,14 +86,9 @@
       <div class="mt-8 text-white w-full flex flex-col items-center">
         {#if $user.user.id != null}
           <!-- User Avatar and some Account information -->
-          <div class="">
-            <!-- <Avatar /> -->
+          <!-- <div class="">
 
-            <!-- Texts -->
-            <!-- <div class="ml-4"> -->
-              <!-- <input type="text" value="{$user.user.name}"> -->
-            <!-- </div> -->
-          </div>
+          </div> -->
 
           <!-- Go to my Chats button -->
           <button class="mt-6 bg-white text-gray-800 font-semibold rounded-lg px-4 py-2">
