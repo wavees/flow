@@ -1,38 +1,92 @@
 // import
 import { writable } from "svelte/store";
-import axios from "axios";
+import socket from "../../network/socket";
+
+import Cookie from "cookie-universal";
+const cookies = Cookie();
 
 import api from "../application/api";
 
-const url = api.wavees.url;
-const version = api.wavees.version;
+// We'll listen to any socket updates.
+socket.on('account', (data) => {
+  // Let's firstly check our user data
+  // and then try to update it in our
+  // store.
+  const account = data.response;
 
-// 
-// func createUserStore()
-// This function will create
-// user store, that we'll use
-// later in application.
+  console.log("ACCOUNT UPDATE");
+  console.log(account);
+
+  if (account.type == "userAccount") {
+    // So now we need to update our account
+    // information.
+    user.updateUser(account);
+
+    // By the way, now we need to update user's
+    // chat array.
+    user.clearChats();
+    socket.emit('getData', { type: "chats", token: account.token });
+  };
+});
+
+socket.on('accountCreation', (data) => {
+  const token     = data.response.token;
+  const account   = data.response.user;
+
+  console.log("USER CREATION");
+  console.log(data);
+  console.log(token);
+  console.log(account);
+
+  // And now let's just update our token
+  // and user information!
+  if (token.token != null) {
+    cookies.set('_account_token', token.token, {
+      path: "/"
+    });
+  };
+
+  if (account.type == "userAccount") {
+    user.updateUser(account)
+
+    // And we need to update our chats list!
+    user.clearChats();
+    socket.emit('getData', { type: "chats", token: token.token })
+  };
+});
+
+// Here we'll listen to any chats updates.
+socket.on('chats', (data) => {
+  // And now let's just update our chat information.
+  const chats = data.response;
+
+  console.log("CHATS UPDATE");
+
+  console.log(chats);
+  console.log(typeof chats);
+  if (typeof chats == "array") {
+    user.updateChats(chats);
+  };
+});
+
 // 
 function createUserStore() {
   // Default object for the store
   let store = {
-    loaded: false,
-    error: null,
+    user: {
+      loaded: false,
 
-    current: {
       id: null,
       token: null,
-      email: null,
-      username: null,
-      avatar: null,
-      coins: 100,
 
-      alias: null
+      name: null,
     },
 
-    tokens: [],
+    chats: {
+      loaded: false,
 
-    profiles: []
+      list: []
+    }
   };
 
   // Get some functions from writable store...
@@ -45,265 +99,68 @@ function createUserStore() {
 
     // clearStore
     // Clears this store
-    clearStore: () => {
+    clearChats: () => {
       update((object) => {
-        object.current = {
-          token: null
+        object.chats = {
+          loaded: false,
+          list: []
         };
 
-        object.tokens = [];
-        object.profiles = [];
-      
         return object;
       });
     },
 
-    // setToken
-    // Set session/user token (We'll get user information
-    // and store it in current object)
-    setToken: (token) => {
-      // Let's get that user object..
-      axios.get(`${url}/${version}/account/${token}`)
-      .then((response) => {
-        let data = response.data;
-
-        // Let's determine what type of object
-        // is it.
-        if (data.type == "user") {
-          // And now let's populate our store with new data
-          loadAlias(data.uid);
-
-          update((object) => {
-            object.loaded = true;
-
-            object.current.id       = data.uid;
-            object.current.token    = token;
-            object.current.email    = data.email;
-            object.current.username = data.username;
-            object.current.avatar   = data.avatar;
-            object.current.coins    = data.coins;
-
-            object.tokens           = [token];
-            
-            return object;
-          });
-        } else if (data.type == "session") {
-          // Let's update our store with
-          // new data
-          update((object) => {
-            object.loaded = true;
-
-            object.tokens = data.profiles;
-            return object;
-          });
-
-          // And now let's get some data on current
-          // user account and then let's populate
-          // our store with new data.
-          let currentToken = data.current.token == null ? data.profiles[0] : data.current.token;
-
-          axios.get(`${url}/${version}/account/${currentToken}`)
-          .then((response) => {
-            let data = response.data;
-            loadAlias(data.uid);
-
-            // And now let's populate our store with new data
-            update((object) => {
-              object.current.id       = data.uid;
-              object.current.token    = currentToken;
-              object.current.email    = data.email;
-              object.current.username = data.username;
-              object.current.avatar   = data.avatar;
-              object.current.coins    = data.coins;
-
-              return object;
-            });
-          });
-        } else {
-          update((object) => {
-            object.loaded = true;
-            object.error = null;
-
-            return object;
-          });
-        };
-      }).catch(() => {
-        update((object) => {
-          object.loaded = false;
-          object.error = "NotFound";
-
-          return object;
-        });
-      });
-    },
-
-    // setLoaded
-    // Changes object.loaded state to { state }.
-    setLoaded: (state) => {
+    // updateUser
+    // Function, that'll just
+    // paste user information
+    // in this store.
+    updateUser: (user) => {
       update((object) => {
-        object.loaded = state;
+        object.user.loaded = true;
+
+        object.user.id           = user.uid;
+        object.user.token        = user.token;
+        
+        object.user.name         = user.name;
+
+        object.user.avatar       = user.avatar;
+        object.user.creationDate = user.creationDate;
 
         return object;
       });
     },
 
-    // loadProfiles
-    // Load profiles (their avatars, emails and so on) to
-    // local storage.
-    loadProfiles: (tokens) => {
-      // Let's firstly clear profiles
-      // array.
+    // updateChats
+    // Function, that'll update our
+    // chats list
+    updateChats: (chats) => {
       update((object) => {
-        object.profiles = [];
-        return object;
-      });
+        object.chats.loaded = true;
 
-      // And now let's load a bunch
-      // of new profiles.
-      tokens.forEach((token) => {
-        loadProfile(token);
-      });
-    },
-
-    addProfile: (data) => {
-      update((object) => {
-        object.profiles.push(data);
+        object.chats.list = chats;
 
         return object;
       });
     },
 
-    // 
-    setAlias: (alias) => {
-      update((object) => {
-        object.current.alias = alias;
-
-        return object;
-      });
+    // checkUser
+    // Function, that'l check our
+    // user (or it will create
+    // new user);
+    checkAccount: (token) => {
+      if (token) {
+        console.log("CHECK ACCOUNT");
+        // Let's check our user.
+        socket.emit('getData', { type: "account", token: token });
+      } else {
+        console.log("CREATE NEW ACCOUNT");
+        // Let's create our user.
+        socket.emit('getData', { type: "createAccount", user: { name: "Test User" }});
+      };
     }
-
-    // setCurrent
-    // Set current token. This function will check
-    // for token usability and then it'll set it
-    // as current token.
-
-    // Don't need it anymore.
   }
 };
 
 const user = createUserStore();
 
-async function loadAlias(uid, type = "user") {
-  axios.get(`${api.blog.url}/${api.blog.version}/author/${uid}/alias`)
-  .then((response) => {
-    let data = response.data;
-
-    if (data.alias != null) {
-      // Let's now update user's current alias.
-      if (type == "user") {
-        user.setAlias(data.alias);
-      } else if (type == "currentUser") {
-        current.setAlias(data.alias);
-      };
-    };
-  });
-};
-
-async function loadProfile(token) {
-  axios.get(`${url}/${version}/account/${token}`)
-  .then((response) => {
-    let data = response.data;
-
-    if (data.type == "user") {
-      let profile = {
-        id: data.uid,
-
-        email: data.email,
-        username: data.username,
-
-        avatar: data.avatar,
-        token: token,
-
-        coins: data.coins
-      };
-
-      user.addProfile(profile);
-    };
-  }).catch((error) => {
-    let data = {};
-    if (error.response != null) {
-      data = error.response.data;
-    };
-
-    if (data.error != "UserNotFound") {
-      loadProfile(token);
-    };
-  });
-};
-
 export { user };
-
-// 
-// func createCurrentUserStore()
-// This function will create
-// store for currently viewed
-// user. And this store, by the
-// way, will store all needed information
-// about this user.
-function createCurrentUserStore() {
-  // Main store structure
-  let store = {
-    username: null,
-
-    email: null,
-    avatar: null,
-  
-    uid: null,
-
-    loaded: false
-  };
-
-  // Let's now get some 
-  const { subscribe, set, update } = writable(store);
-
-  return {
-    subscribe,
-
-    // loadProfile
-    // This function will
-    // load user profile
-    // and store it in this
-    // store.
-    loadProfile: (uid) => {
-      // And now let's try to fetch some information
-      // about this account...
-      axios.get(`${url}/${version}/user/${uid}`)
-      .then((response) => {
-        let data = response.data;
-        loadAlias(uid, "currentUser");
-
-        update((object) => {
-          object.username = data.username;
-          object.email    = data.email;
-          object.avatar   = data.avatar;
-          object.id       = id;
-          object.coins    = data.coins;
-
-          object.loaded   = true;
-
-          return object;
-        });
-      }).catch(() => {
-        update((object) => {
-          object.loaded = true;
-
-          return object;
-        })
-      });
-    }
-  }
-};
-
-const current = createCurrentUserStore();
-
-export { current };

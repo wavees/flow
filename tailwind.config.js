@@ -8,6 +8,12 @@ module.exports = {
 
       borderWidth: {
         "1": "1px"
+      },
+
+      width: {
+        "35vw": "35vw",
+        "40vw": "40vw",
+        "45vw": "45vw"
       }
     },
   },

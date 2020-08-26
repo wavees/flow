@@ -4,45 +4,37 @@
 	import socket from "../network/socket.js";
 
 	// import
-	import { locale, locales } from "svelte-i18n";
-	import { user } from "../config/stores/user.js";
-	
 	import { fade } from "svelte/transition";
-	
-	import { colors, theme, Spinner } from "darkmode-components/src/index"
-  import Cookie from "cookie-universal";
+	import { onMount } from "svelte";
 
-  // Cookies instance
-  const cookies = Cookie();
+	// Importing components
+	import {
+		Spinner
+	} from "darkmode-components/src/index";
 
-	// Let's check our current language.
-	const language = cookies.get('_language');
+	// Cookie Manager
+	import Cookie from "cookie-universal";
+	const cookies = Cookie();
 
-	locale.set("ru");
-	if (language) {
-		if ($locales.include(language)) {
-			locale.set(language);
+	import { user } from "../config/stores/user.js";
+
+	let connectionProblems = null;
+
+	// onMount event
+	// Here we'll check our user.
+	onMount(() => {
+		if (socket.connected) {
+			user.checkAccount(cookies.get('_account_token', { path: "/" }));
+		} else {
+			connectionProblems = true;
+
+			socket.on('connect', () => {
+				connectionProblems = false;
+
+				user.checkAccount(cookies.get('_account_token', { path: "/" }));
+			});
 		};
-	};
-
-	// Let's check (and update if needed) our current
-	// theme
-	const currentTheme = cookies.get('_theme');
-
-	theme.setTheme("light");
-	if (currentTheme != null) {
-		theme.setTheme(currentTheme);
-	};
-
-  // Let's get user token and then
-  // let's do something very interesting...
-  const token = cookies.get('_account_token');
-
-  if (token != null) {
-		user.setToken(token);
-  } else {
-    user.setLoaded(true);
-  }
+	});
 </script>
 
 <svelte:head>
@@ -50,7 +42,7 @@
 	<title>Wavees Flow</title>
 </svelte:head>
 
-{ #if $user.loaded } 
+{ #if $user.user.loaded } 
 	<main>
 		<slot></slot>
 	</main>
