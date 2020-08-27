@@ -36,7 +36,7 @@
 {/if}
 
 <!-- Main Layout -->
-<div style="min-height: 100vh; { backgrounds[Math.floor(Math.random() * backgrounds.length)] }" class="relative w-full lg:w-40vw shadow-lg flex flex-col items-center justify-center py-12 md:py-0">
+<div style="height: 100vh; overflow-y: auto; { backgrounds[Math.floor(Math.random() * backgrounds.length)] }" class="relative w-full lg:w-40vw shadow-lg flex flex-col items-center justify-center">
   <!-- Header -->
   <!-- <div class="absolute inset-x-0 top-0 w-full py-4 flex justify-center">
     #Logotype
@@ -45,11 +45,11 @@
   </div> -->
 
   <!-- Hero with some Icons -->
-  <div>
   
+  <div class="py-24 md:py-0">
     <!-- Some Texts -->
-    <div class="w-full text-center px-8 lg:px-16">
-      <h1 class="font-semibold text-5xl md:text-3xl text-white">Connect your PCs and Phones</h1>
+    <div class="w-full text-center px-8 lg:px-16 mt-32 md:mt-0">
+      <h1 class="font-semibold text-3xl text-white">Connect your PCs and Phones</h1>
       <p class="text-base md:text-sm text-gray-100">Connect your computers and phones for the most convenient, fast and secure data transfer between all of them.</p>
     </div>
 
