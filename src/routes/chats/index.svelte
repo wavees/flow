@@ -3,14 +3,14 @@
   // components.
   import { user } from "../../config/stores/user.js";
 
-  import { fade } from 'svelte/transition';
+  import { fade, slide } from 'svelte/transition';
 
   import Notifications from "../../components/Notifications.svelte";
   import NetworkStatus from "../../components/NetworkStatus.svelte";
 
   import socket from "../../network/socket.js";
 
-  import { Avatar } from "darkmode-components/src/index";
+  import { Avatar, Spinner } from "darkmode-components/src/index";
 
   import { onMount } from "svelte";
   import { goto } from "@sapper/app";
@@ -27,12 +27,22 @@
   onMount(() => {
     setTimeout(() => {
       loaded = true;
+
+      // Let's update our chats
+      user.clearChats();
+      socket.emit('getData', { type: "chats", token: $user.user.token })
     }, 50);
+  });
+
+  socket.on('createChat', (data) => {
+    // Let's now add this chat to our
+    // chat list.
+    user.addChat(data.response.chat);
   });
 </script>
 
 {#if !loaded}
-  <div out:fade style="z-index: 2;" class="absolute inset-x-0 top-0 bg-white w-full h-full"></div>
+  <div out:fade style="z-index: 3;" class="absolute inset-x-0 top-0 bg-white w-full h-full"></div>
 {/if}
 
 <!-- Main Layout -->
@@ -49,31 +59,46 @@
     </div>
 
     <!-- Chats List -->
-    <div class="py-2 flex flex-col flex-grow justify-center px-4 md:px-6">
+    <div style="z-index: 1;" class="py-2 flex flex-col flex-grow justify-center px-4 md:px-6">
       <!-- Chat Entry -->
-      <!-- <div class="cursor-pointer w-full flex items-center rounded-lg hover:bg-gray-200 hover:shadow-lg px-6 py-2">
-        #Avatar
-        <Avatar type="word" word="C" />
 
-        #Name and Last Message
-        <div class="ml-4">
-          <h1 class="text-xl font-semibold">Chat Name</h1>
-          <p class="text-sm"><span class="text-gray-700">Test User:</span> Hello everybody!</p>
+      {#if !$user.chats.loaded}
+        <!-- Chats Loading -->
+        <div style="min-height: 80vh;" class="w-full flex flex-col justify-center items-center">
+          <Spinner size="15" />
         </div>
+      { :else }
+        {#if $user.chats.list.length > 0}
+          <!-- content here -->
+          <div class="pb-12">
+            {#each $user.chats.list as chat}
+              <div in:slide class="cursor-pointer my-1 w-full flex items-center rounded-lg hover:bg-gray-200 hover:shadow-lg px-6 py-2">
+                <!-- Avatar -->
+                <Avatar type="word" word="C" />
 
-      </div> -->
-      
-      <!-- Empty Chat List -->
-      <div style="min-height: 80vh;" class="w-full flex flex-col justify-center items-center">
-        <img style="width: 20vw;" src="./illustrations/undraw_Taken.svg" alt="Nothing Found">
+                <!-- Name and Last Message -->
+                <div class="ml-4">
+                  <h1 class="text-xl font-semibold">{chat.name}</h1>
+                  <p class="text-sm"><span class="text-gray-700">Test User:</span> Hello everybody!</p>
+                </div>
 
-        <h1 class="mt-6">Nothing Found!</h1>
-      </div>
+              </div>
+            {/each}
+          </div>
+        { :else }
+          <!-- Empty Chat List -->
+          <div style="min-height: 80vh;" class="w-full flex flex-col justify-center items-center">
+            <img style="width: 20vw;" src="./illustrations/undraw_Taken.svg" alt="Nothing Found">
+
+            <h1 class="mt-6">Nothing Found! { $user.chats.list.length } { $user.chats.loaded }</h1>
+          </div>
+        {/if}
+      {/if}
     </div>
   </div>
 
-  <div class="absolute inset-x-0 bottom-0 w-full flex justify-center">
-    <div class="w-full md:w-40vw flex justify-between px-4 md:px-8 py-2">
+  <div style="z-index: 2;" class="absolute inset-x-0 bottom-0 w-full flex justify-center">
+    <div class="w-full md:w-40vw flex justify-between px-4 md:px-8 py-2 bg-white">
       <!-- User Account -->
       <div class="flex items-center">
         <Avatar size="1.8" type="word" word="H" />

@@ -5,8 +5,6 @@ import socket from "../../network/socket";
 import Cookie from "cookie-universal";
 const cookies = Cookie();
 
-import api from "../application/api";
-
 // We'll listen to any socket updates.
 socket.on('account', (data) => {
   // Let's firstly check our user data
@@ -14,29 +12,16 @@ socket.on('account', (data) => {
   // store.
   const account = data.response;
 
-  console.log("ACCOUNT UPDATE");
-  console.log(account);
-
   if (account.type == "userAccount") {
     // So now we need to update our account
     // information.
     user.updateUser(account);
-
-    // By the way, now we need to update user's
-    // chat array.
-    user.clearChats();
-    socket.emit('getData', { type: "chats", token: account.token });
   };
 });
 
 socket.on('accountCreation', (data) => {
   const token     = data.response.token;
   const account   = data.response.user;
-
-  console.log("USER CREATION");
-  console.log(data);
-  console.log(token);
-  console.log(account);
 
   // And now let's just update our token
   // and user information!
@@ -48,10 +33,6 @@ socket.on('accountCreation', (data) => {
 
   if (account.type == "userAccount") {
     user.updateUser(account)
-
-    // And we need to update our chats list!
-    user.clearChats();
-    socket.emit('getData', { type: "chats", token: token.token })
   };
 });
 
@@ -60,13 +41,7 @@ socket.on('chats', (data) => {
   // And now let's just update our chat information.
   const chats = data.response;
 
-  console.log("CHATS UPDATE");
-
-  console.log(chats);
-  console.log(typeof chats);
-  if (typeof chats == "array") {
-    user.updateChats(chats);
-  };
+  user.updateChats(chats);
 });
 
 // 
@@ -138,6 +113,14 @@ function createUserStore() {
         object.chats.loaded = true;
 
         object.chats.list = chats;
+        
+        return object;
+      });
+    },
+
+    addChat: (chat) => {
+      update((object) => {
+        object.chats.list.push(chat);
 
         return object;
       });
@@ -149,13 +132,11 @@ function createUserStore() {
     // new user);
     checkAccount: (token) => {
       if (token) {
-        console.log("CHECK ACCOUNT");
         // Let's check our user.
-        socket.emit('getData', { type: "account", token: token });
+        socket.emit('authorize', { token: token });
       } else {
-        console.log("CREATE NEW ACCOUNT");
         // Let's create our user.
-        socket.emit('getData', { type: "createAccount", user: { name: "Test User" }});
+        socket.emit('register', { name: "Test User" } );
       };
     }
   }
