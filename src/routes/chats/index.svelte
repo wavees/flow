@@ -12,6 +12,8 @@
 
   import { Avatar, Spinner } from "darkmode-components/src/index";
 
+  import ChatPanel from "../../components/ChatPanel.svelte";
+
   import { onMount } from "svelte";
   import { goto } from "@sapper/app";
 
@@ -29,9 +31,19 @@
       loaded = true;
 
       // Let's update our chats
-      user.clearChats();
-      socket.emit('getData', { type: "chats", token: $user.user.token })
+      if (!$user.chats.loaded) {
+        user.clearChats();
+        socket.emit('chats');
+      };
     }, 50);
+  });
+
+  // Here we'll listen to any chats updates.
+  socket.on('chats', (data) => {
+    // And now let's just update our chat information.
+    const chats = data;
+
+    user.updateChats(chats);
   });
 
   socket.on('createChat', (data) => {
@@ -72,17 +84,7 @@
           <!-- content here -->
           <div class="pb-12">
             {#each $user.chats.list as chat}
-              <div in:slide class="cursor-pointer my-1 w-full flex items-center rounded-lg hover:bg-gray-200 hover:shadow-lg px-6 py-2">
-                <!-- Avatar -->
-                <Avatar type="word" word="C" />
-
-                <!-- Name and Last Message -->
-                <div class="ml-4">
-                  <h1 class="text-xl font-semibold">{chat.name}</h1>
-                  <p class="text-sm"><span class="text-gray-700">Test User:</span> Hello everybody!</p>
-                </div>
-
-              </div>
+              <ChatPanel chat={chat} />
             {/each}
           </div>
         { :else }

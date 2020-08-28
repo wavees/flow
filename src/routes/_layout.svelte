@@ -25,15 +25,11 @@
 	onMount(() => {
 		if (socket.connected) {
 			user.checkAccount(cookies.get('_account_token', { path: "/" }));
-		} else {
-			connectionProblems = true;
-
-			socket.on('connect', () => {
-				connectionProblems = false;
-
-				user.checkAccount(cookies.get('_account_token', { path: "/" }));
-			});
 		};
+	});
+
+	socket.on('connect', () => {
+		user.checkAccount(cookies.get('_account_token', { path: "/" }));
 	});
 </script>
 

@@ -10,7 +10,7 @@ socket.on('account', (data) => {
   // Let's firstly check our user data
   // and then try to update it in our
   // store.
-  const account = data.response;
+  const account = data;
 
   if (account.type == "userAccount") {
     // So now we need to update our account
@@ -20,8 +20,8 @@ socket.on('account', (data) => {
 });
 
 socket.on('accountCreation', (data) => {
-  const token     = data.response.token;
-  const account   = data.response.user;
+  const token     = data.token;
+  const account   = data.user;
 
   // And now let's just update our token
   // and user information!
@@ -34,14 +34,6 @@ socket.on('accountCreation', (data) => {
   if (account.type == "userAccount") {
     user.updateUser(account)
   };
-});
-
-// Here we'll listen to any chats updates.
-socket.on('chats', (data) => {
-  // And now let's just update our chat information.
-  const chats = data.response;
-
-  user.updateChats(chats);
 });
 
 // 

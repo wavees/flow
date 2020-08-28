@@ -37,16 +37,18 @@
   });
 
   function createChat() {
-    console.log($user.user.token);
-    console.log(chatName);
     loading = true;
 
-    socket.emit('getData', { type: "createChat", token: $user.user.token, chat: { name: chatName } })
+    socket.emit('createChat', { name: chatName })
   };
 
-  socket.on('createChat', (data) => {
-    goto('/chats');
+  socket.on('chatCreation', (chat) => {
+    setTimeout(() => {
+      goto(`/chat/${chat.id}/invitations`);
+    }, 150);
   });
+
+  let backButtonHovering = false;
 
   let loading = false;
   let chatName = "New Chat";
@@ -59,6 +61,14 @@
 <!-- Main Layout -->
 <div style="min-height: 100vh; { backgrounds[Math.floor(Math.random() * backgrounds.length)] }" class="relative w-full lg:w-40vw shadow-lg flex flex-col items-center justify-center py-12 md:py-0">
   <!-- Some kind of a Header -->
+  <div style="z-index: 2;" class="absolute inset-x-0 top-0 py-4 px-4">
+    <button on:mouseover={() => backButtonHovering = true} on:mouseout={() => backButtonHovering = false} on:click={() => goto(`/chats`)} class="px-2 py-2 rounded-lg { backButtonHovering ? "bg-white" : "" }">
+      <span style="height: 1.2rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{ backButtonHovering ? "#000" : "#fff" }" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </span>
+    </button>
+  </div>
+
   <div class="absolute inset-x-0 top-0 w-full flex justify-center items-center py-4">
     <img style="height: 2.2rem;" src="./icons/speech-balloon.png" alt="Chat Bubble">
     <h1 class="text-white text-xl font-semibold ml-2">Chat creation</h1>
