@@ -19,8 +19,16 @@
       loaded = true;
     }, 50);
 
+    // By the way, let's request some
+    // information about our chat...
+    socket.emit("chat", $page.params.cid);
+  
     // Let's now get our invitations list...
     socket.emit("invitations", $page.params.cid);
+  });
+
+  socket.on('chat', (data) => {
+    chat = data;
   });
 
   socket.on("invitations", (invitations) => {
@@ -34,6 +42,10 @@
       size: 250
     });
   });
+
+  let chat = {
+    name: "undefined"
+  };
 
   let currentInvitation = {};
   let invitations = [];
@@ -69,7 +81,11 @@
 
   <div style="z-index: 1;" class="absolute inset-x-0 top-0 w-full flex justify-center items-center py-4">
     <img style="height: 2.2rem;" src="./icons/handshake.png" alt="Handshake">
-    <h1 class="text-white text-xl font-semibold ml-2">Invitation</h1>
+
+    <div class="ml-2 flex flex-col items-start">
+      <h1 class="text-white text-xl font-semibold">Invitation for chat</h1>
+      <span class="text-xs border-b-1 border-dotted border-green-400 text-white font-semibold">{chat.name.slice(0, 25)}{chat.name.split('').length >= 25 ? "..." : ""}</span>
+    </div>
   </div>
 
   <!-- Canvas -->
