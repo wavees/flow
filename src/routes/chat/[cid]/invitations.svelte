@@ -19,6 +19,12 @@
       loaded = true;
     }, 50);
 
+    // We also need to check some
+    // specific settings of this screen.
+    if ($page.query.closeOnConnection) {
+      closeOnConnection = true;
+    };
+
     // By the way, let's request some
     // information about our chat...
     socket.emit("chat", $page.params.cid);
@@ -46,6 +52,8 @@
   let chat = {
     name: "undefined"
   };
+
+  let closeOnConnection = false;
 
   let currentInvitation = {};
   let invitations = [];
@@ -117,4 +125,12 @@
       </button>
     </div>
   </div>
+
+  {#if closeOnConnection}
+    <div class="absolute w-full inset-x-0 bottom-0 flex justify-center">
+      <p class="text-xs text-gray-200">This screen will close if someone joins this chat.</p>
+
+      <!-- Button to cancel this action -->
+    </div>
+  {/if}
 </div>

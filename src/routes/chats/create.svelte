@@ -45,7 +45,7 @@
 
   socket.on('chatCreation', (chat) => {
     setTimeout(() => {
-      goto(`/chat/${chat.id}/invitations`);
+      goto(`/chat/${chat.id}/invitations?closeOnConnection=true`);
     }, 150);
   });
 
@@ -95,10 +95,10 @@
         <h1 class="text-xl text-white font-semibold mt-6">Creating your chat...</h1>
       </div>
     { :else }
-      <div class="w-full relative h-48 flex flex-wrap px-4">
+      <div class="w-full relative flex flex-col md:flex-row flex-wrap px-4">
         <!-- Chat Name -->
-        <div class="w-1/2 h-full my-4 md:my-0 px-4">
-          <div class="rounded-lg bg-white w-full h-full py-4 px-3">
+        <div class="w-full md:w-1/2 h-48 my-4 md:my-0 px-12 md:px-4">
+          <div class="rounded-lg bg-white w-full h-full py-4 px-6 md:px-3">
             <!-- Texts -->
             <div>
               <h1 class="font-semibold text-xl text-gray-900 opacity-75">Chat name</h1>
@@ -116,7 +116,7 @@
                 {#if randomizingName}
                   <Spinner size="15" />
                 
-                  <p class="ml-2">Randomizing..</p>
+                  <p class="ml-2">Randomizing...</p>
                 { :else }
                   <img style="height: 1rem;" src="./icons/twisted-rightwards-arrows.png" alt="<3">
                   
@@ -128,8 +128,8 @@
         </div>
 
         <!-- Chat Type -->
-        <div class="w-1/2 h-full my-4 md:my-0 px-4">
-          <div style="overflow-y: hidden;" class="rounded-lg bg-white w-full h-full relative py-4 px-3">
+        <div class="w-full md:w-1/2 h-56 md:h-48 my-4 md:my-0 px-12 md:px-4">
+          <div style="overflow-y: hidden;" class="rounded-lg bg-white w-full h-full relative py-4 px-6 md:px-3">
             <!-- Texts -->
             <div>
               <h1 class="font-semibold text-xl text-gray-900 opacity-75">Publicity</h1>
