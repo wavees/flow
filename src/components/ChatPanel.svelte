@@ -3,10 +3,17 @@
   import { Avatar } from "darkmode-components/src/index";
   import { goto } from "@sapper/app";
 
+  import { onMount } from "svelte";
+
   import { slide } from "svelte/transition";
 
   import Popover from "svelte-popover";
 
+  onMount(() => {
+    console.log("CHAT");
+    console.log(chat);
+  });
+  
   let opened  = false;
   let clicked = false;
   export let chat = {};
@@ -24,20 +31,18 @@
     </div>
   </div>
 
-  <!-- Buttons -->
-  <div class="float-right">
-    <!-- More Buttons and Information -->
-    <Popover bind:open={opened} action="hover" arrow={false} placement="bottom-center" overlayColor="rgba(0,0,0,0.1)">
-      <button on:click={() => goto(`/chat/${chat.id}/settings`)} slot="target" class="px-2 py-2 rounded-lg hover:bg-white">
-        <img style="height: 1.2rem;" src="./icons/grid.svg" alt="...">
-      </button>
-      
-      <div slot="content" class="pt-4">
-        <div style="width: 7vw;" class="shadow-lg rounded-lg flex bg-white items-center justify-center { clicked ? "py-4" : "py-2" } px-4 text-center">
-          <h1 class="text-sm text-gray-800">Chat Settings</h1>
-        </div>
-      </div>
-    </Popover>
+  <!-- Some information -->
+  <div class="h-full flex flex-col justify-between">
+    <p class="text-gray-700 text-xs">Day ago</p>
+
+    <!-- Some user icons -->
+    <div class="relative flex justify-center">
+      {#each chat.members.slice(0, 3) as member}
+        <span class="">
+          <!-- <Avatar size="1.5" /> -->
+        </span>
+      {/each}
+    </div>
   </div>
 
 </div>
