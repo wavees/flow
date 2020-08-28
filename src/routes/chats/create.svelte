@@ -32,6 +32,7 @@
     // Let's now get our randomized chat name...
     axios.get('https://random-word-api.herokuapp.com/word?number=2&swear=0')
     .then((response) => {
+      randomizingName = false;
       chatName = response.data.map((string) => string.charAt(0).toUpperCase() + string.slice(1)).join(' ');
     });
   });
@@ -48,6 +49,18 @@
     }, 150);
   });
 
+  function randomizeName() {
+    randomizingName = true;
+
+    // Let's now get our randomized chat name...
+    axios.get('https://random-word-api.herokuapp.com/word?number=2&swear=0')
+    .then((response) => {
+      randomizingName = false;
+      chatName = response.data.map((string) => string.charAt(0).toUpperCase() + string.slice(1)).join(' ');
+    });
+  };
+
+  let randomizingName = true;
   let backButtonHovering = false;
 
   let loading = false;
@@ -74,32 +87,98 @@
     <h1 class="text-white text-xl font-semibold ml-2">Chat creation</h1>
   </div>
 
-  <div>
+  <div class="w-full">
     {#if loading}
       <div class="flex flex-col items-center">
-        <Spinner size="65" color="#fff" />
+        <Spinner size="25" color="#fff" />
 
         <h1 class="text-xl text-white font-semibold mt-6">Creating your chat...</h1>
       </div>
     { :else }
-      <!-- Texts -->
-
-      <div>
+      <div class="w-full relative h-48 flex flex-wrap px-4">
         <!-- Chat Name -->
-        <div class="mt-6 w-full">
-          <input bind:value={chatName} type="text">
+        <div class="w-1/2 h-full my-4 md:my-0 px-4">
+          <div class="rounded-lg bg-white w-full h-full py-4 px-3">
+            <!-- Texts -->
+            <div>
+              <h1 class="font-semibold text-xl text-gray-900 opacity-75">Chat name</h1>
+              <p class="text-xs text-gray-700">~ Make it more memorable and lovable</p>
+            </div>
+
+            <!-- Input -->
+            <div class="mt-4 w-full">
+              <input class="w-full px-1 bg-transparent text-gray-800 border-b-2 border-dotted border-green-700" type="text" bind:value={chatName}>
+            </div>
+
+            <!-- Buttons -->
+            <div class="mt-6 w-full">
+              <button on:click={() => randomizeName()} class="flex justify-center w-full py-2 items-center text-sm text-gray-900">
+                {#if randomizingName}
+                  <Spinner size="15" />
+                
+                  <p class="ml-2">Randomizing..</p>
+                { :else }
+                  <img style="height: 1rem;" src="./icons/twisted-rightwards-arrows.png" alt="<3">
+                  
+                  <p class="ml-2">Randomize!</p>
+                {/if}
+              </button>
+            </div>
+          </div>
         </div>
 
-        <!-- Buttons -->
-        <div class="mt-6">
-          <!-- Create Chat -->
-          <button on:click={() => createChat()} class="py-2 bg-white rounded-lg px-4 w-full text-center">
-            Create chat named <span class="border-b-2 border-dotted border-green-600">{chatName}</span>
-          </button>
+        <!-- Chat Type -->
+        <div class="w-1/2 h-full my-4 md:my-0 px-4">
+          <div style="overflow-y: hidden;" class="rounded-lg bg-white w-full h-full relative py-4 px-3">
+            <!-- Texts -->
+            <div>
+              <h1 class="font-semibold text-xl text-gray-900 opacity-75">Publicity</h1>
+              <p class="text-xs text-gray-700">~ Will you share this chat with someone to talk to?</p>
+            </div>
 
-          <!-- Cancel Button -->
+            <!-- Buttons -->
+            <div class="mt-4 w-full">
+              <!-- Public -->
+              <button class="border-1 border-solid border-transparent px-3 py-3 rounded-lg w-full text-start">
+                <h1 class="font-semibold text-xs">Public</h1>
+                <p class="text-extra-xs text-gray-700">Oh... So you decided to be more public, yeah?</p>
+              </button>
+
+              <!-- Only for my Devices -->
+              <button class="border-1 border-solid border-blue-500 px-3 py-3 rounded-lg w-full text-start">
+                <h1 class="font-semibold text-xs">Only for Me</h1>
+                <p class="text-extra-xs text-gray-700">We'll make this chat <span class="border-b-1 border-dotted border-gray-700">Super-Duper-Mega</span> private (no)</p>
+              </button>
+            </div>
+
+            <!-- CockBlocked -->
+            <div style="background: rgba(0,0,0,0.5)" class="absolute inset-x-0 top-0 w-full h-full flex flex-col justify-center items-center rounded-lg">
+              <img style="height: 2.2rem;" src="./icons/lock.png" alt="Lock">
+
+              <!-- Texts -->
+              <div class="mt-2 text-center">
+                <h1 class="text-base font-semibold text-white">Blocked</h1>
+                <p class="text-xs text-gray-100">Still in development, huh?</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     {/if}
+  </div>
+
+  <!-- Buttons -->
+  <div class="absolute inset-x-0 bottom-0 w-full py-3 px-4 md:px-8 lg:px-12">
+    <div class="w-full flex { loading ? "hidden" : "" } ">
+      <!-- Create Chat -->
+      <button on:click={() => createChat()} class="py-2 mr-3 bg-white rounded-lg w-full text-center text-gray-900">
+        Create chat
+      </button>
+
+      <!-- Cancel -->
+      <button on:click={() => goto('/chats')} class="ml-3 py-2 bg-white rounded-lg w-full text-center text-gray-900">
+        Cancel
+      </button>
+    </div>
   </div>
 </div>

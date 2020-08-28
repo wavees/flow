@@ -92,7 +92,7 @@
           <div style="min-height: 80vh;" class="w-full flex flex-col justify-center items-center">
             <img style="width: 20vw;" src="./illustrations/undraw_Taken.svg" alt="Nothing Found">
 
-            <h1 class="mt-6">Nothing Found! { $user.chats.list.length } { $user.chats.loaded }</h1>
+            <h1 class="mt-6">Nothing Found!</h1>
           </div>
         {/if}
       {/if}
