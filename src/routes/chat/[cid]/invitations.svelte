@@ -23,6 +23,8 @@
     // specific settings of this screen.
     if ($page.query.closeOnConnection) {
       closeOnConnection = true;
+
+      socket.emit('listenTo', [ `chat/join-${$page.params.cid}` ]);
     };
 
     // By the way, let's request some
@@ -31,6 +33,14 @@
   
     // Let's now get our invitations list...
     socket.emit("invitations", $page.params.cid);
+  });
+
+  socket.on('event.chat/joined', (data) => {
+    if (data.chat == $page.params.cid) {
+      if (closeOnConnection) {
+        goto(`/chat/${$page.params.cid}`);
+      };
+    };
   });
 
   socket.on('chat', (data) => {
@@ -127,10 +137,11 @@
   </div>
 
   {#if closeOnConnection}
-    <div class="absolute w-full inset-x-0 bottom-0 flex justify-center">
-      <p class="text-xs text-gray-200">This screen will close if someone joins this chat.</p>
+    <div class="absolute w-full inset-x-0 bottom-0 flex items-center justify-center py-2">
+      <p class="text-extra-xs text-gray-200">This screen will close if someone joins this chat.</p>
 
       <!-- Button to cancel this action -->
+      <p on:click={() => closeOnConnection = false} class="text-extra-xs ml-1 cursor-pointer border-b-1 border-dotted border-gray-200 text-white">Do not close</p>
     </div>
   {/if}
 </div>

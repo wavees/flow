@@ -30,8 +30,7 @@
   });
 
   socket.on('invitationUsed', (data) => {
-    console.log(data);
-    goto(`/chats`);
+    goto(`/chat/${data.cid}`);
   });
 </script>
 
