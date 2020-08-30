@@ -8,6 +8,9 @@
 
   import { onMount } from "svelte";
 
+  import MembersPanel from "../../../components/Chat/Settings/MembersPanel.svelte";
+  import InformationPanel from "../../../components/Chat/Settings/InformationPanel.svelte";
+
   // Page Store
   import { stores } from "@sapper/app";
   const { page } = stores();
@@ -26,14 +29,6 @@
     "background: linear-gradient(to right, #ff9966, #ff5e62);",
     "background: linear-gradient(to right, #7f00ff, #e100ff);",
     "background: linear-gradient(to right, #4568dc, #b06ab3);"
-  ];
-
-  let memberIconList = [
-    "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/wolf-face_1f43a.png",
-    "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/fox-face_1f98a.png",
-    "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/raccoon_1f99d.png",
-    "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/cat_1f408.png",
-    "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/lion-face_1f981.png"
   ];
 </script>
 
@@ -78,51 +73,12 @@
 
       <!-- Chat Information -->
       <div class="my-4 w-full md:w-1/2 h-48 px-12 md:px-4">
-        <div class="w-full h-full rounded-lg cursor-pointer bg-white py-4 px-4 relative">
-          <!-- Image -->
-          <img style="width: 3rem;" src="./icons/clipboard.png" alt="Clipboard here">
-
-          <!-- Texts -->
-          <div class="mt-4 pr-4 md:pr-6">
-            <h1 class="font-semibold text-black text-xl opacity-75">Information</h1>
-            <p class="text-gray-700 text-xs">Change chat <span class="rounded-lg px-2 py-1 bg-gray-200">Name</span> and <span class="rounded-lg px-2 py-1 bg-gray-200 text-whtie">Avatar</span> right here!</p>
-          </div>
-
-          <div style="background: rgba(0,0,0,0.5)" class="absolute inset-x-0 top-0 w-full h-full flex flex-col justify-center items-center rounded-lg">
-            <img style="height: 2.2rem;" src="./icons/lock.png" alt="Lock">
-
-            <!-- Texts -->
-            <div class="mt-2 text-center">
-              <h1 class="text-base font-semibold text-white">Blocked</h1>
-              <p class="text-xs text-gray-100">Still in development</p>
-            </div>
-          </div>
-        </div>
+        <InformationPanel cid={$page.params.cid} />
       </div>
 
       <!-- Members -->
       <div class="my-4 w-full md:w-1/2 h-48 px-12 md:px-4">
-        <div class="w-full h-full rounded-lg cursor-pointer bg-white py-4 px-4 relative">
-          <!-- Image -->
-          <img style="width: 3rem;" src="{ memberIconList[Math.floor(Math.random() * memberIconList.length)] }" alt="Yeah!">
-
-          <!-- Texts -->
-          <div class="mt-4 pr-4 md:pr-6">
-            <h1 class="font-semibold text-black text-xl opacity-75">Members</h1>
-            <p class="text-gray-700 text-xs">Here you can <span class="rounded-lg px-2 py-1 bg-red-200">Ban</span>, <span class="rounded-lg px-2 py-1 bg-red-200">Kick</span> and <span class="rounded-lg px-2 py-1 bg-green-200">View</span> all members of this chat!</p>
-          </div>
-
-          <!-- CockBlocked
-          <div style="background: rgba(0,0,0,0.5)" class="absolute inset-x-0 top-0 w-full h-full flex flex-col justify-center items-center rounded-lg">
-            <img style="height: 2.2rem;" src="./icons/lock.png" alt="Lock">
-
-            #Texts
-            <div class="mt-2 text-center">
-              <h1 class="text-base font-semibold text-white">Blocked</h1>
-              <p class="text-xs text-gray-100">This section is in development, too</p>
-            </div>
-          </div> -->
-        </div>
+        <MembersPanel cid={$page.params.cid} />
       </div>
 
       <!-- Security -->
