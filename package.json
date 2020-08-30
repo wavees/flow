@@ -13,6 +13,9 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "clipboard": "^2.0.6",
+    "clipboard-copy": "^3.1.0",
+    "clipboardy": "^2.3.0",
     "compression": "^1.7.1",
     "cookie-universal": "^2.1.3",
     "darkmode-components": "^1.1.1",

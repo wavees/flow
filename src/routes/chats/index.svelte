@@ -65,7 +65,7 @@
       <h1 class="text-2xl font-semibold block">My Chats</h1>
 
       <!-- Create new Chat button -->
-      <button on:click={() => goto('/chats/create')} class="">
+      <button on:click={() => goto('/chat/create')} class="">
         <img style="height: 1.2rem;" src="./icons/plus.svg" alt="Create new Chat">
       </button>
     </div>

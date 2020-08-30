@@ -22,7 +22,7 @@
 <div on:click={() => goto(`/chat/${chat.id}`)} in:slide class="cursor-pointer my-1 w-full flex justify-between items-center rounded-lg hover:bg-gray-200 hover:shadow-lg px-6 py-2">
   <!-- Avatar -->
   <div class="flex items-center">
-    <Avatar type="word" word="C" />
+    <Avatar type="image" avatar={chat.avatar || "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/kissing-face-with-smiling-eyes_1f619.png"} />
 
     <!-- Name and Last Message -->
     <div class="ml-4">

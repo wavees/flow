@@ -44,6 +44,8 @@
   };
 
   socket.on('chatCreation', (chat) => {
+    user.addChat(chat);
+
     setTimeout(() => {
       goto(`/chat/${chat.id}/invitations?closeOnConnection=true`);
     }, 150);

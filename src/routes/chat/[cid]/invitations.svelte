@@ -10,6 +10,8 @@
 
   import { Spinner } from "darkmode-components/src/index";
 
+  import InvitationCopyButtom from "../../../components/Chat/Invitations/CopyButton.svelte";
+
   // Page Store
   import { stores } from "@sapper/app";
   const { page } = stores();
@@ -70,6 +72,8 @@
   let loaded = false;
   let loading = true;
 
+  let flipped = false;
+
   let backButtonHovering = false;
 
   let backgrounds = [
@@ -86,11 +90,64 @@
   </div>
 {/if}
 
+<style>
+  .container {
+    -webkit-perspective: 800px;
+    -ms-perspective: 800px;
+    perspective: 800px;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-transition: -webkit-transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: -webkit-transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), -webkit-transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 6px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    cursor: pointer;
+  }
+  .card .div {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 6px;
+    background: #fff;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: box;
+    display: flex;
+    -webkit-box-pack: center;
+    -o-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -o-box-align: center;
+    align-items: center;
+    font: 16px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: #47525d;
+  }
+  .card .back {
+    -webkit-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+  }
+  .card.flipped {
+    -webkit-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+  }
+</style>
+
 <!-- Main Layout -->
 <div style="min-height: 100vh; { backgrounds[Math.floor(Math.random() * backgrounds.length)] }" class="relative w-full lg:w-40vw shadow-lg flex flex-col items-center justify-center py-12 md:py-0 md:pt-8">
   <!-- Some kind of a Header -->
   <div style="z-index: 2;" class="absolute inset-x-0 top-0 py-4 px-4">
-    <button on:mouseover={() => backButtonHovering = true} on:mouseout={() => backButtonHovering = false} on:click={() => goto(`/chat/${$page.params.cid}`)} class="px-2 py-2 rounded-lg { backButtonHovering ? "bg-white" : "" }">
+    <button on:mouseover={() => backButtonHovering = true} on:mouseout={() => backButtonHovering = false} on:click={() => history.back()} class="px-2 py-2 rounded-lg { backButtonHovering ? "bg-white" : "" }">
       <span style="height: 1.2rem;">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{ backButtonHovering ? "#000" : "#fff" }" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </span>
@@ -107,13 +164,47 @@
   </div>
 
   <!-- Canvas -->
-  <div class="w-64 h-64 bg-white rounded-lg relative flex justify-center items-center p-2">
-    {#if loading}
-      <div class="absolute inset-x-0 top-0 w-full h-full rounded-lg flex justify-center items-center">
-        <Spinner size="25" />
+  <div on:click={() => {
+    if (flipped) {
+      flipped = false;
+    } else {
+      flipped = true;
+    };
+  }} class="w-64 h-64 container rounded-lg relative flex justify-center items-center">
+    <div class="{ flipped ? "flipped" : "" } card">
+      <!-- Front Side -->
+      <div class="front div w-full h-full p-2">
+        {#if loading}
+          <div class="absolute inset-x-0 top-0 w-full h-full rounded-lg flex justify-center items-center">
+            <Spinner size="25" />
+          </div>
+        {/if}
+        <canvas class="w-full h-full rounded-lg" id="code"></canvas>
       </div>
-    {/if}
-    <canvas class="w-full h-full rounded-lg" id="code"></canvas>
+
+      <!-- Back Side -->
+      <div class="back div w-full h-full select-none flex flex-col">
+        <!-- Texts -->
+        <div class="px-4 md:px-8 text-center">
+          <h1 class="text-xl text-black font-semibold">You can use your mobile phone!</h1>
+          <p class="text-xs text-gray-700">And yes, you can download and use our mobile application! It'll be a lot easier for you. And, by the way, there are a lot of different interesting features in mobile version!</p>
+        </div>
+
+        <!-- Links to Download -->
+        <div class="mt-4 px-4 md:px-8">
+          <button class="rounded-lg items-center py-2 bg-white border-1 border-solid border-blue-400 w-full flex justify-start px-4 md:px-6">
+            <!-- Icon -->
+            <img style="height: 1.6rem;" src="./icons/inbox-tray.png" alt="Inbox Icon">
+
+            <!-- Texts -->
+            <div class="ml-4 flex flex-col items-start">
+              <h1 class="text-sm font-semibold">Download</h1>
+              <p class="text-extra-xs text-gray-700">from Wavees Servers</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div style="{ loading ? "visibility: hidden;" : "" }" class="w-full px-4 md:px-6 lg:px-8 mt-6 text-center">
@@ -129,10 +220,9 @@
         How to use
       </button>
 
-      <button class="py-2 w-full ml-3 rounded-lg bg-white flex items-center justify-center text-gray-900">
-        <img style="height: 1.2rem;" class="mr-2" src="./icons/link.svg" alt="Link Icon">
-        Show Link
-      </button>
+      <div class="w-full">
+        <InvitationCopyButtom classes="w-full" invitation={currentInvitation.words} />
+      </div>
     </div>
   </div>
 
