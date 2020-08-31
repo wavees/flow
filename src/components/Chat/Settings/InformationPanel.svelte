@@ -3,6 +3,14 @@
   import socket from "../../../network/socket.js";
   import { onMount } from "svelte";
 
+  import { goto } from "@sapper/app";
+  // Page store
+  import { stores } from "@sapper/app";
+  const { page } = stores();
+
+  import { createEventDispatcher } from "svelte";
+  const dispatch = createEventDispatcher();
+
   import { user } from "../../../config/stores/user.js";
 
   onMount(() => {
@@ -60,7 +68,7 @@
   };
 </script>
 
-<div class="w-full h-full rounded-lg cursor-pointer bg-white py-4 px-4 relative">
+<div on:click={() => goto(`/chat/${$page.params.cid}/settings/information`)} class="w-full h-full rounded-lg cursor-pointer bg-white py-4 px-4 relative">
   <!-- Image -->
   <img style="width: 3rem;" src="./icons/clipboard.png" alt="Clipboard here">
 

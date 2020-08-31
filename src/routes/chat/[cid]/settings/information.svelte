@@ -1,7 +1,7 @@
 <script>
   // Let's import some modules and components
   import { fade } from "svelte/transition";
-  import InvitationsScreen from "./_screens/invitations.svelte";
+  import InformationScreen from "../_screens/information.svelte";
 
   import { onMount } from "svelte";
 
@@ -33,5 +33,5 @@
 
 <!-- Main Layout -->
 <div style="min-height: 100vh; { backgrounds[Math.floor(Math.random() * backgrounds.length)] }" class="relative flex items-center w-full lg:w-40vw shadow-lg py-12 md:py-0 md:pt-8">
-  <InvitationsScreen cid={$page.params.cid} closeOnConnection={$page.query.closeOnConnection} />
+  <InformationScreen cid={$page.params.cid} />
 </div>

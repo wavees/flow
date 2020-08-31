@@ -32,6 +32,7 @@ socket.on('accountCreation', (data) => {
   };
 
   if (account.type == "userAccount") {
+    user.updateChats([]);
     user.updateUser(account)
   };
 });
@@ -113,6 +114,24 @@ function createUserStore() {
     addChat: (chat) => {
       update((object) => {
         object.chats.list.push(chat);
+
+        return object;
+      });
+    },
+
+    changeChat: (cid, chat) => {
+      update((object) => {
+        let chats = object.chats.list;
+
+        // And now let's try to update this
+        // chat info in our chats array...
+        let itemIndex = chats.findIndex(x => x.id == cid);
+
+        if (itemIndex) {
+          chats[itemIndex] = chat;
+        };
+
+        object.chats.list = chats;
 
         return object;
       });

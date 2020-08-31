@@ -50,7 +50,7 @@
 {/if}
 
 <!-- Main Layout -->
-<div style="min-height: 100vh;" class="relative w-full lg:w-40vw bg-white shadow-lg flex flex-col items-center justify-center py-12 md:py-0">
+<div style="min-height: 100vh;" class="relative w-full lg:w-40vw bg-white rounded-b-2lg shadow-lg flex flex-col items-center justify-center py-12 md:py-0">
   <!-- Some kind of a Header -->
   <div class="absolute inset-x-0 top-0 w-full flex justify-between items-center py-4">
     <div class="w-full flex px-4">
@@ -78,5 +78,20 @@
       <SettingsButton cid={$page.params.cid} inversedColors={true} />
     </div>
   </div>
-  <!-- Canvas -->
+
+  <!-- Messages List -->
+  <div class="w-full flex-grow">
+  
+  </div>
+
+  <!-- Send new message bar -->
+  <div class="w-full items-center">
+    <div style="{ backgrounds[Math.floor(Math.random() * backgrounds.length)] }" class="rounded-full w-full flex items-center py-1 px-1">
+      <input class="w-full h-full text-md py-3 pl-2 bg-transparent text-white" type="text" placeholder="Message...">
+
+      <button class="px-3 py-3 rounded-full bg-white">
+        <svg style="height: 1.4rem; width: 1.4rem;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </div>
+  </div>
 </div>
