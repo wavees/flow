@@ -17,14 +17,6 @@
       loaded = true;
     }, 50);
 
-    // We also need to check some
-    // specific settings of this screen.
-    if (closeOnConnection) {
-      closeOnConnection = true;
-
-      socket.emit('listenTo', [ `chat/join-${cid}` ]);
-    };
-
     // By the way, let's request some
     // information about our chat...
     socket.emit("chat", cid);

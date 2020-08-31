@@ -28,10 +28,25 @@
       loaded = true;
     }, 50);
 
+    if (socket.connected) {
+      socket.emit('listenTo', [ `chat/change-${$page.params.cid}` ]);
+    };
+
+    socket.on('connection', () => {
+      socket.emit('listenTo', [ `chat/change-${$page.params.cid}` ]);
+    });
+
     socket.emit("chat", $page.params.cid);
   });
 
   socket.on('chat', (data) => {
+    chat = data;
+  });
+
+  // @EVENT
+  // Chat Change
+  socket.on('event.chat/changed', (data) => {
+    // Let's just update our chat information.
     chat = data;
   });
 

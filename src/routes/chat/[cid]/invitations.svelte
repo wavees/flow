@@ -3,6 +3,8 @@
   import { fade } from "svelte/transition";
   import InvitationsScreen from "./_screens/invitations.svelte";
 
+  import socket from "../../../network/socket.js";
+
   import { onMount } from "svelte";
 
   // Page Stores
@@ -20,6 +22,14 @@
     setTimeout(() => {
       loaded = true;
     }, 50);
+
+    if (socket.connected) {
+      socket.emit('listenTo', [ `chat/join-${$page.params.cid}` ]);
+    };
+
+    socket.on('connection', () => {
+      socket.emit('listenTo', [ `chat/join-${$page.params.cid}` ]);
+    });
   });
 
   let loaded = false;

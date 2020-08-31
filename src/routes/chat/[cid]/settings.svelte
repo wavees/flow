@@ -23,6 +23,14 @@
     setTimeout(() => {
       loaded = true;
     }, 50);
+
+    if (socket.connected) {
+      socket.emit('listenTo', []);
+    };
+
+    socket.on('connection', () => {
+      socket.emit('listenTo', []);
+    });
   });
 
   let currentScreen;
