@@ -23,6 +23,7 @@
 
     if (cachedChat != null) {
       chat = cachedChat;
+      chatName = cachedChat.name;
     };
 
     // But we'll update this chat's info anyway
