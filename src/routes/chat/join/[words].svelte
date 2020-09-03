@@ -13,13 +13,6 @@
 
   import { Spinner } from "darkmode-components/src/index";
 
-  let backgrounds = [
-    "background: linear-gradient(to right, #00b4db, #0083b0);",
-    "background: linear-gradient(to right, #ff9966, #ff5e62);",
-    "background: linear-gradient(to right, #7f00ff, #e100ff);",
-    "background: linear-gradient(to right, #4568dc, #b06ab3);"
-  ];
-
   onMount(() => {
     const token = $user.user.token;
     const words = $page.params.words;
@@ -34,6 +27,9 @@
   });
 </script>
 
-<div style="min-height: 100vh; { backgrounds[Math.floor(Math.random() * backgrounds.length)] }" class="relative w-full lg:w-40vw shadow-lg flex flex-col items-center justify-center py-12 md:py-0">
-  <Spinner size="65" color="#fff" />
+<div class="absolute w-full h-screen flex justify-center items-center bg-white">
+  <!-- Branding -->
+  <div class="flex flex-col justify-center items-center">
+    <Spinner size="15"  />
+  </div>
 </div>

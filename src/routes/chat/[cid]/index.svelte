@@ -36,11 +36,27 @@
       socket.emit('listenTo', [ `chat/change-${$page.params.cid}` ]);
     });
 
+
+    // Let's firstly try to find this chat's
+    // data in cached storage.
+
+    let cachedChat = $user.chats.list.find(x => x.id == $page.params.cid);
+
+    if (cachedChat != null) {
+      chat = cachedChat;
+    };
+
+    // But yeah, we'll update this chat's information
+    // anyway.
     socket.emit("chat", $page.params.cid);
   });
 
   socket.on('chat', (data) => {
     chat = data;
+
+    // And now let's also change our
+    // cached chat information (if needed)
+    user.changeChat($page.params.cid, chat);
   });
 
   // @EVENT

@@ -16,6 +16,16 @@
   onMount(() => {
     // By the way, let's request some
     // information about our chat...
+
+    // Let's firstly check if we have got this
+    // chat's information cached.
+    let cachedChat = $user.chats.list.find(x => x.id == cid);
+
+    if (cachedChat != null) {
+      chat = cachedChat;
+    };
+
+    // But we'll update this chat's info anyway
     socket.emit("chat", cid);
   
     // Let's now get our invitations list...
@@ -36,6 +46,10 @@
 
   let backButtonHovering = false;
   let chatName;
+
+  function changeChat(e) {
+    chat = e;
+  };
 </script>
 
 <div class="flex flex-col w-full h-screen items-center relative pt-20">
@@ -64,7 +78,7 @@
     <div class="flex absolute flex-col items-center justify-center w-full px-4 md:px-8 lg:px-16">
       <!-- Change chat name -->
       <ChatName on:changeChat={(e) => {
-        chat = e.detail;
+        changeChat(e.detail);
       }} cid={cid} chatName={chatName} originalChatName={chat.name} />
     </div>
   </div>

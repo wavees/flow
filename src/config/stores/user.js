@@ -125,9 +125,9 @@ function createUserStore() {
 
         // And now let's try to update this
         // chat info in our chats array...
-        let itemIndex = chats.findIndex(x => x.id == cid);
+        let itemIndex = chats.indexOf(chats.find(x => x.id == cid));
 
-        if (itemIndex) {
+        if (itemIndex !== -1) {
           chats[itemIndex] = chat;
         };
 
