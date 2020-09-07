@@ -8,9 +8,6 @@
 
   import { onMount } from "svelte";
 
-  import InformationScreen from "./_screens/information.svelte";
-  import InvitationsScreen from "./_screens/invitations.svelte";
-
   import InvitationsPanel from "../../../components/Chat/Settings/InvitationsPanel.svelte"
   import MembersPanel from "../../../components/Chat/Settings/MembersPanel.svelte";
   import InformationPanel from "../../../components/Chat/Settings/InformationPanel.svelte";
@@ -66,33 +63,6 @@
     <img style="height: 2.2rem;" src="./icons/toolbox.png" alt="Wrench">
     <h1 class="text-white text-xl font-semibold ml-2">Settings</h1>
   </div>
-
-  <!-- CurrentScreen -->
-  {#if currentScreen == "invitations"}
-    <div style="z-index: 999;" class="absolute inset-x-0 top-0 px-2 w-full flex flex-col items-center h-screen">
-      <div on:click={(e) => currentScreen = null} class="cursor-pointer w-full flex-grow">
-      </div>
-
-      <div transition:fade style="overflow-y: auto;" class="bg-white flex-grow rounded-lg shadow-md flex items-center">
-        <InvitationsScreen noHeader={true} inversed={true} cid={$page.params.cid} />
-      </div>
-
-      <div on:click={(e) => currentScreen = null} class="cursor-pointer w-full flex-grow">
-      </div>
-    </div>
-  { :else if currentScreen == "information" }
-    <div style="z-index: 999;" class="absolute inset-x-0 top-0 px-2 w-full flex flex-col items-center h-screen">
-      <div on:click={(e) => currentScreen = null} class="cursor-pointer w-full flex-grow">
-      </div>
-
-      <div transition:fade style="overflow-y: auto;" class="bg-white flex-grow rounded-lg shadow-md flex items-center">
-        <InformationScreen noHeader={true} inversed={true} cid={$page.params.cid} />
-      </div>
-
-      <div on:click={(e) => currentScreen = null} class="cursor-pointer w-full flex-grow">
-      </div>
-    </div>
-  {/if}
 
   <!-- Content -->
   <div style="overflow-y: auto; overflow-x: hidden;" class="w-full flex-grow flex items-center relative">

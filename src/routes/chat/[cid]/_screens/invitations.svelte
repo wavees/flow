@@ -3,6 +3,9 @@
   import socket from "../../../../network/socket.js";
   import { user } from "../../../../config/stores/user.js";
 
+  import axios from "axios";
+  import api from "../../../../config/application/api";
+
   import { fade } from "svelte/transition";
   import { goto } from "@sapper/app";
 
@@ -17,12 +20,48 @@
       loaded = true;
     }, 50);
 
-    // By the way, let's request some
-    // information about our chat...
-    socket.emit("chat", cid);
-  
-    // Let's now get our invitations list...
-    socket.emit("invitations", cid);
+    // Let's get some information about this chat.
+    let cachedChat = $user.chats.list.find((x) => x.id == cid);
+    if (cachedChat) {
+      loading = false;
+
+      chat = cachedChat;
+      invitations = chat.invitations;
+
+      currentInvitation = invitations[0];
+
+      // Let's update our QR Code element.
+      var qr = new QRious({
+        element: document.getElementById('code'),
+        value: `https://flow.wavees.ml/chat/join/${encodeURIComponent(currentInvitation.words)}`,
+        size: 250
+      });
+    } else {
+      // We need to request new information about this chat.
+      // ${api.current.url}/${api.current.version}
+      axios.get(`${api.current.url}/${api.current.version}/chats/${cid}`, { headers: { "Authorization": `Bearer ${$user.user.token}` } })
+      .then((response) => {
+        loading = false;
+
+        chat = response.data;
+        invitations = chat.invitations;
+
+        currentInvitation = invitations[0];
+
+        // Let's update our QR Code element.
+        var qr = new QRious({
+          element: document.getElementById('code'),
+          value: `https://flow.wavees.ml/chat/join/${encodeURIComponent(currentInvitation.words)}`,
+          size: 250
+        });
+
+        // And now let's "cache" this chat.
+        user.addChat(chat);
+      }).catch((error) => {
+        console.log("ERROR WHILE GETTING CHAT INFORMATION");
+        console.log(error.response.data);
+      });
+    };
   });
 
   socket.on('event.chat/joined', (data) => {
@@ -31,22 +70,6 @@
         goto(`/chat/${cid}`);
       };
     };
-  });
-
-  socket.on('chat', (data) => {
-    chat = data;
-  });
-
-  socket.on("invitations", (invitations) => {
-    loading = false;
-    currentInvitation = invitations[0];
-
-    // And now let's update our qrcode canvas...
-    var qr = new QRious({
-      element: document.getElementById('code'),
-      value: `https://flow.wavees.ml/chat/join/${encodeURIComponent(currentInvitation.words)}`,
-      size: 250
-    });
   });
 
   let chat = {

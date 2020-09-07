@@ -1,7 +1,9 @@
 <script>
   // Let's import some modules and components
-  import socket from "../../../network/socket.js";
   import { user } from "../../../config/stores/user.js";
+
+  import axios from "axios";
+  import api from "../../../config/application/api";
 
   import { onMount } from "svelte";
 
@@ -19,11 +21,18 @@
 
     // Let's now send our request
     // to server.
-    socket.emit('useInvite', words);
-  });
+    axios.post(`${api.current.url}/${api.current.version}/chats/invite`, { words }, { headers: { "Authorization": `Bearer ${token}` } })
+    .then((response) => {
+      if (response.data.cid != null) {
+        goto(`/chat/${response.data.cid}`, true);
+      };
+    }).catch((response) => {
+      const error = response.response.data;
 
-  socket.on('invitationUsed', (data) => {
-    goto(`/chat/${data.cid}`);
+      if (error.error == "UserAlreadyAChatMember") {
+        goto(`/chat/${error.cid}`);
+      };
+     });
   });
 </script>
 

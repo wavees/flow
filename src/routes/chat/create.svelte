@@ -5,6 +5,7 @@
   import { user } from "../../config/stores/user.js";
 
   import axios from "axios";
+  import api from "../../config/application/api";
 
   import { fade, slide } from 'svelte/transition';
 
@@ -40,16 +41,23 @@
   function createChat() {
     loading = true;
 
-    socket.emit('createChat', { name: chatName })
+    // And now let's create our chat...
+    axios.post(`${api.current.url}/${api.current.version}/chats`, { name: chatName }, { headers: { "Authorization": `Bearer ${$user.user.token}` } })
+    .then((response) => {
+      const chat = response.data.chat;
+
+      user.addChat(chat);
+
+      // And now let's redirect user to our
+      // chat's invitations screen.
+      setTimeout(() => {
+        goto(`/chat/${chat.id}/invitations?closeOnConnection=true`);
+      }, 150);
+    }).catch((error) => {
+      console.log("ERROR WHILE CREATING CHAT");
+      console.log(error);
+    });
   };
-
-  socket.on('chatCreation', (chat) => {
-    user.addChat(chat);
-
-    setTimeout(() => {
-      goto(`/chat/${chat.id}/invitations?closeOnConnection=true`);
-    }, 150);
-  });
 
   function randomizeName() {
     randomizingName = true;

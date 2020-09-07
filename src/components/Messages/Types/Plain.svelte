@@ -25,8 +25,8 @@
 
     <!-- Author Icon -->
     {#if side == "left"}
-      <div class="">
-        <div style="width: 2.6rem; height: 2.6rem; background-image: url({author.avatar || "https://miro.medium.com/max/720/1*W35QUSvGpcLuxPo3SRTH4w.png"}); background-size: cover; background-position: center center;" class="rounded-full"></div>
+      <div class="mt-1">
+        <div style="width: 1.6rem; height: 1.6rem; background-image: url({author.avatar || "./avatars/default.png"}); background-size: cover; background-position: center center;" class="rounded-full"></div>
       </div>
     {/if}
   </div>

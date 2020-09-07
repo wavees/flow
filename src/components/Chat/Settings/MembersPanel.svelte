@@ -1,19 +1,30 @@
 <script>
   // Let's now import some modules and components.
-  import socket from "../../../network/socket.js";
   import { onMount } from "svelte";
+
+  import axios from "axios";
+  import api from "../../../config/application/api.js";
 
   import { user } from "../../../config/stores/user.js";
 
   onMount(() => {
     // And now let's send our request to check
     // user's permisisons.
-    socket.emit('checkPermission', $user.user.token, cid, "banMembers");
-    socket.emit('checkPermission', $user.user.token, cid, "kickMembers");
-    socket.emit('checkPermission', $user.user.token, cid, "viewMembers");
+
+    let permissions = ["banMembers", "kickMembers", "viewMembers"];
+
+    permissions.forEach((permission) => {
+      axios.get(`${api.current.url}/${api.current.version}/chats/${cid}/permission/${permission}`, { headers: { "Authorization": `Bearer ${$user.user.token}` } })
+      .then((response) => {
+        checkPermission(response.data);
+      }).catch((error) => {
+        console.log("ERROR WHILE CHECKING PERMISSION");
+        console.log(erorr.response.data);
+      });
+    });
   });
 
-  socket.on('checkedPermission', (data) => {
+  function checkPermission(data) {
     if (data.type == "permission") {
       switch (data.permission) {
         case "banMembers":
@@ -45,7 +56,7 @@
           break;
       };
     };
-  });
+  };
 
   export let cid;
 

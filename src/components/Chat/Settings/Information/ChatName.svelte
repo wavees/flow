@@ -3,6 +3,9 @@
   import socket from "../../../../network/socket.js";
   import { createEventDispatcher } from "svelte";
 
+  import axios from "axios";
+  import api from "../../../../config/application/api.js";
+
   import { onMount } from "svelte";
   import { Spinner } from "darkmode-components/src/index";
 
@@ -12,7 +15,21 @@
 
   // Function, that'll try to update chat's name
   function updateName(name) {
-    socket.emit('changeChatName', cid, name == null ? chatName : name);
+    sentRequest = true;
+
+    // And now let's send our PUT request.
+    axios.put(`${api.current.url}/${api.current.version}/chats/${cid}/name`, { name } , { headers: { "Authorization": `Bearer ${$user.user.token}` } })
+    .then((response) => {
+      sentRequest = false;
+      
+      if (response.data.id == cid) {
+        dispatch("changeChat", response.data);
+        user.changeChat(cid, response.data);
+      };
+    }).catch((error) => {
+      console.log("ERROR WHILE SAVING CHAT NAME");
+      console.log(error.response.data);
+    });
   };
 
   socket.on('chatName', (response) => {
@@ -24,6 +41,8 @@
       };
     };
   });
+
+  let sentRequest = false;
 
   export let cid;
   export let chatName;
@@ -37,18 +56,27 @@
     <img style="height: 1.2rem;" src="./icons/" alt="">
 
     <div class="mr-2">
-      <h1 class="opacity-75 text-black text-xl font-semibold">Chat name
+      <div class="flex">
+        <h1 class="opacity-75 text-black text-xl font-semibold">Chat name</h1>
+        
         {#if originalChatName != chatName}
-          <Spinner size="15" />
-        {/if}
-      </h1>
+          {#if sentRequest}
+            <p class="ml-2 text-xs text-black">Saving...</p>
+          { :else }
+            <p class="ml-2 text-xs text-black">Not saved</p>
+          {/if}
+        { :else }
+          <p class="ml-2 text-xs text-black">Saved</p>
+        { /if }
+      </div>
+
       <p class="text-gray-700 text-sm">Change your chat's name, f*ck yeah!</p>
     </div>
   </div>
 
   <!-- Input -->
   <div class="mt-4 w-full">
-    <input id="name" on:input={(e) => {
+    <input id="name" on:change={(e) => {
       updateName(e.target.value);
     }} bind:value={chatName} class="w-full px-1 bg-transparent text-gray-800 border-b-2 border-dotted border-green-700" type="text">
   </div>

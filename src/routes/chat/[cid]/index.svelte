@@ -3,6 +3,9 @@
   import socket from "../../../network/socket.js";
   import { user } from "../../../config/stores/user.js";
 
+  import axios from "axios";
+  import api from "../../../config/application/api";
+
   import { fade } from "svelte/transition";
 
   import { onMount } from "svelte";
@@ -31,12 +34,10 @@
     }, 50);
 
     if (socket.connected) {
-      socket.emit('getMessages', $page.params.cid);
       socket.emit('listenTo', [ `chat/change-${$page.params.cid}`, `chat/messages-${$page.params.cid}` ]);
     };
 
     socket.on('connection', () => {
-      socket.emit('getMessages', $page.params.cid);
       socket.emit('listenTo', [ `chat/change-${$page.params.cid}`, `chat/messages-${$page.params.cid}` ]);
     });
 
@@ -47,11 +48,30 @@
 
     if (cachedChat != null) {
       chat = cachedChat;
+    } else {
+      // Let's firstly get some information about this chat.
+      axios.get(`${api.current.url}/${api.current.version}/chats/${$page.params.cid}`, { headers: { "Authorization": `Bearer ${$user.user.token}` } })
+      .then((response) => {
+        
+        chat = response.data;
+
+        user.addChat(chat);
+      }).catch((error) => {
+        console.log("ERROR WHILE GETTING CHAT INFORMATION");
+        console.log(error.response.data);
+      });
     };
 
-    // But yeah, we'll update this chat's information
-    // anyway.
-    socket.emit("chat", $page.params.cid);
+    // And now we need to get this chat's messages...
+    axios.get(`${api.current.url}/${api.current.version}/chats/${$page.params.cid}/messages`, { headers: { "Authorization": `Bearer ${$user.user.token}` } })
+    .then((response) => {
+
+      // WIP: Message Caching system;
+      messages = response.data;
+    }).catch((error) => {
+      console.log("ERROR WHILE GETTING MESSAGES LIST");
+      console.log(error.response.data);
+    });
   });
 
   socket.on('chat', (data) => {
@@ -107,6 +127,9 @@
     // Let's firstly check if we have
     socket.emit('sendMessage', $page.params.cid, { type: "plain", content: message });
     message = null;
+
+    // And now let's add this message to
+    // our list.
   };
 
   let chat = {

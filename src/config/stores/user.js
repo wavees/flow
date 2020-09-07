@@ -1,43 +1,15 @@
 // import
 import { writable } from "svelte/store";
-import socket from "../../network/socket";
+import axios from 'axios';
+
+import socket from "../../network/socket.js";
+
+import moment from "moment";
+import api from "../application/api";
 
 import Cookie from "cookie-universal";
 const cookies = Cookie();
 
-// We'll listen to any socket updates.
-socket.on('account', (data) => {
-  // Let's firstly check our user data
-  // and then try to update it in our
-  // store.
-  const account = data;
-
-  if (account.type == "userAccount") {
-    // So now we need to update our account
-    // information.
-    user.updateUser(account);
-  };
-});
-
-socket.on('accountCreation', (data) => {
-  const token     = data.token;
-  const account   = data.user;
-
-  // And now let's just update our token
-  // and user information!
-  if (token.token != null) {
-    cookies.set('_account_token', token.token, {
-      path: "/"
-    });
-  };
-
-  if (account.type == "userAccount") {
-    user.updateChats([]);
-    user.updateUser(account)
-  };
-});
-
-// 
 function createUserStore() {
   // Default object for the store
   let store = {
@@ -144,10 +116,45 @@ function createUserStore() {
     checkAccount: (token) => {
       if (token) {
         // Let's check our user.
-        socket.emit('authorize', { token: token });
+        axios.get(`${api.current.url}/${api.current.version}/account`, { headers: { "Authorization": `Bearer ${token}` } })
+        .then((response) => {
+          user.updateUser(response.data);
+
+          socket.emit('authorize', { token });
+        }).catch((error) => {
+          console.log("ERROR");
+          console.log(error.response.data);
+        });
       } else {
         // Let's create our user.
-        socket.emit('register', { name: "Test User" } );
+        
+        // But Firstly let's get random user's username
+        axios.get('https://random-word-api.herokuapp.com/word?number=1&swear=0')
+        .then((response) => {
+          let name = response.data.map((string) => string.charAt(0).toUpperCase() + string.slice(1)).join(' ');
+          
+          axios.post(`${api.current.url}/${api.current.version}/account`, { name })
+          .then((response) => {
+            // Let's now save user's token.
+            cookies.set('_account_token', response.data.token.token, { expires: moment().add(1, 'year').toDate() });
+  
+            user.updateUser({
+              token: response.data.token.token,
+  
+              // Another user information...
+              name: response.data.user.name,
+              uid: response.data.user.uid,
+              avatar: response.data.user.avatar,
+              creationDate: response.data.user.creationDate
+            });
+
+            // And let's authorize in our socket.
+            socket.emit('authorize', { token: response.data.token.token });
+          }).catch((error) => {
+            console.log("ERROR WHILE CREATING USER");
+            console.log(error.response.data);
+          });
+        });
       };
     }
   }

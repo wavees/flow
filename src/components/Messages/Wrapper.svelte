@@ -7,6 +7,7 @@
 
   // Let's import some components
   import PlainMessage from "./Types/Plain.svelte";
+  import JoinMessage from "./Types/JoinMessage.svelte";
 
   onMount(() => {
     // And now let's get some information about our
@@ -33,5 +34,6 @@
 
 {#if message.type == "plain"}
   <PlainMessage author={authorData} message={message.content} side={$user.user.id == author.uid ? "right" : "left"} />
-<!-- { :else if message.type == "system" } -->
+{ :else if message.type == "joinMessage" }
+  <JoinMessage user={authorData} />
 {/if}

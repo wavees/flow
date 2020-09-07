@@ -10,6 +10,9 @@
 
   import socket from "../../network/socket.js";
 
+  import axios from "axios";
+  import api from "../../config/application/api";
+
   import { Avatar, Spinner } from "darkmode-components/src/index";
 
   import ChatPanel from "../../components/ChatPanel.svelte";
@@ -33,20 +36,21 @@
       // Let's update our chats
       if (!$user.chats.loaded) {
         user.clearChats();
-        socket.emit('chats');
+        // And now let's load our chats.
+        axios.get(`${api.current.url}/${api.current.version}/chats/`, { headers: { "Authorization": `Bearer ${$user.user.token}` } })
+        .then((response) => {
+          const chats = response.data;
+
+          user.updateChats(chats)
+        }).catch((error) => {
+          console.log("ERROR WHILE LOADING CHATS LIST");
+          console.log(error.response.data);
+        });
       };
     }, 50);
   });
 
-  // Here we'll listen to any chats updates.
-  socket.on('chats', (data) => {
-    // And now let's just update our chat information.
-    const chats = data;
-
-    user.updateChats(chats);
-  });
-
-  socket.on('createChat', (data) => {
+  socket.on('event.chat/created', (data) => {
     // Let's now add this chat to our
     // chat list.
     user.addChat(data.response.chat);
