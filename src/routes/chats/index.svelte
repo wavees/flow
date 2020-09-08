@@ -37,9 +37,11 @@
       if (!$user.chats.loaded) {
         user.clearChats();
         // And now let's load our chats.
-        axios.get(`${api.current.url}/${api.current.version}/chats/`, { headers: { "Authorization": `Bearer ${$user.user.token}` } })
+        axios.get(`${api.current.url}/${api.current.version}/chats`, { headers: { "Authorization": `Bearer ${$user.user.token}` } })
         .then((response) => {
           const chats = response.data;
+          console.log("CHATS:");
+          console.log(chats);
 
           user.updateChats(chats)
         }).catch((error) => {
