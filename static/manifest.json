@@ -1,8 +1,8 @@
 {
 	"background_color": "#ffffff",
-	"theme_color": "#333333",
-	"name": "Wavees Medals",
-	"short_name": "medals",
+	"theme_color": "#8360c3",
+	"name": "Wavees Flow",
+	"short_name": "flow",
 	"display": "minimal-ui",
 	"start_url": "/",
 	"icons": [

@@ -10,7 +10,7 @@
   import { goto } from "@sapper/app";
 
   import NetworkStatus from "../components/NetworkStatus.svelte";
-  import Button from "../components/Buttons/Normal.svelte";
+  import Button from "../components/Button/index.svelte";
 
   let background;
   let buttonBackground;

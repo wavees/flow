@@ -30,7 +30,7 @@ function createUserStore() {
   };
 
   // Get some functions from writable store...
-  const { subscribe, set, update } = writable(store);
+  const { subscribe, update } = writable(store);
 
   // Return subscribe function and some other
   // functions to manipulate this store.

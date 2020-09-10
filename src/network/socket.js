@@ -3,7 +3,7 @@ import io from "socket.io-client";
 import api from "../config/application/api";
 
 // Let's now run our socket
-const socket = io("https://api.flow.wavees.ml/");
+const socket = io(api.current.url);
 
 // And now let's just export our
 // socket instance.
