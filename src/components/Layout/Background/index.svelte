@@ -4,6 +4,8 @@
   import NormalBackground from "./Types/Normal.background.svelte";
   import ErrorBackground from "./Types/Error.background.svelte";
 
+  // And now let's export some
+  // components parameters
   export let type = "normal";
   export let classes;
 </script>

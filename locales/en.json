@@ -1,2 +1,15 @@
 {
+  "landing": {
+    "hero": {
+      "title": "Connect your PCs and Phones",
+      "subtitle": "Connect your computers and phones for the most convenient, fast and secure data transfer between all of them."
+    }
+  },
+
+  "errors": {
+    "notFound": {
+      "title": "Not Found",
+      "subtitle": "Requested page not found"
+    }
+  }
 }

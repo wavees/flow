@@ -4,25 +4,27 @@
   import socket from "../network/socket.js";
   import { user } from "../config/stores/user.js";
 
+  import backgrounds from "../config/themes/backgrounds.js";
+
   import { fade } from 'svelte/transition';
 
+  import { _ } from "svelte-i18n";
+  
   import { onMount } from "svelte";
   import { goto } from "@sapper/app";
 
-  import NetworkStatus from "../components/NetworkStatus.svelte";
-  import Button from "../components/Button/index.svelte";
+  // Importing components
+  import { Button, Heading, Text, Container } from "../components";
 
-  let background;
+  import NetworkStatus from "../components/NetworkStatus.svelte";
+
   let buttonBackground;
 
+  // Let's now determine if this
+  // screen is loaded or no (currently
+  // used as some kind of a transition between
+  // pages)
   let loaded = false;
-
-  let backgrounds = [
-    "background: linear-gradient(to right, #00b4db, #0083b0);",
-    "background: linear-gradient(to right, #ff9966, #ff5e62);",
-    "background: linear-gradient(to right, #7f00ff, #e100ff);",
-    "background: linear-gradient(to right, #4568dc, #b06ab3);"
-  ];
 
   onMount(() => {
     setTimeout(() => {
@@ -31,26 +33,18 @@
   });
 </script>
 
+<!-- Loading Screen (just white screen) -->
 {#if !loaded}
   <div out:fade style="z-index: 2;" class="absolute inset-x-0 top-0 bg-white w-full h-full"></div>
 {/if}
 
 <!-- Main Layout -->
-<div style="height: 100vh; overflow-y: auto; { backgrounds[Math.floor(Math.random() * backgrounds.length)] }" class="relative w-full lg:w-40vw shadow-lg flex flex-col items-center justify-center">
-  <!-- Header -->
-  <!-- <div class="absolute inset-x-0 top-0 w-full py-4 flex justify-center">
-    #Logotype
-
-    <h1>Flow</h1>
-  </div> -->
-
-  <!-- Hero with some Icons -->
-  
+<Container>
   <div class="py-24 md:py-0">
     <!-- Some Texts -->
     <div class="w-full text-center px-8 lg:px-16 mt-32 md:mt-0">
-      <h1 class="font-semibold text-3xl text-white">Connect your PCs and Phones</h1>
-      <p class="text-base md:text-sm text-gray-100">Connect your computers and phones for the most convenient, fast and secure data transfer between all of them.</p>
+      <Heading weight="semibold" size="3xl">{$_("landing.hero.title", { default: "Connect your PCs and Phones" })}</Heading>
+      <Text classes="text-base md:text-sm" color="gray-100">{$_("landing.hero.subtitle", { default: "Connect your computers and phones for the most convenient, fast and secure data transfer between all of them." })}</Text>
     </div>
 
     <!-- Icons -->
@@ -98,11 +92,6 @@
     <!-- Buttons -->
     <div class="mt-8 text-white w-full flex flex-col items-center">
       {#if $user.user.id != null}
-        <!-- User Avatar and some Account information -->
-        <!-- <div class="">
-
-        </div> -->
-
         <!-- Go to my Chats button -->
         <Button on:click={(e) => {
           goto('/chats');
@@ -116,4 +105,4 @@
       {/if}
     </div>
   </div>
-</div>
+</Container>

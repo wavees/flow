@@ -7,7 +7,7 @@
 	import { fade } from "svelte/transition";
 	import { onMount } from "svelte";
 
-	import Background from "../components/Layout/Background/index.svelte";
+	import { Background } from "../components";
 
 	// Importing components
 	import {

@@ -1,17 +1,29 @@
 <script>
+  // Importing our button types
+  import NormalButton from "./Types/Normal.button.svelte";
 
-  export let whiteOnHover = true;
-  export let background = "linear-gradient(to right, #0f2027, #203a43, #2c5364)";
+  // Exporting some settings
+  export let type = "normal";
+
+  // Button-related parameters
+  export let hoveredBackground;
   export let classes;
-  let hovered = false;
+
+  // Settings object for our buttons
+  $: settings = {
+    // 
+    hoveredBackground,
+
+    // Our custom classes
+    classes
+  };
 </script>
 
-<style>
-  .background {
-    background: var(--bg)
-  }
-</style>
-
-<button on:click style="--bg: {background}" class="{ classes } rounded-lg px-4 py-2 { hovered ? `background ${whiteOnHover ? "text-white" : "text-gray-900"}` : "bg-white text-gray-900" }" on:mouseover={() => hovered = true} on:mouseout={() => hovered = false}>
-  <slot></slot>
-</button>
+{#if type == "ghost"}
+   <!-- content here -->
+{ :else }
+  <!-- @type Normal -->
+  <NormalButton on:click settings={settings}>
+    <slot></slot>
+  </NormalButton>
+{/if}
