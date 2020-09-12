@@ -37,7 +37,7 @@
       if (!$user.chats.loaded) {
         user.clearChats();
         // And now let's load our chats.
-        axios.get(`${api.current.url}/${api.current.version}/chats`, { headers: { "Authorization": `Bearer ${$user.user.token}` } })
+        axios.get(`${api.current.url}/${api.current.version}/chats`, { headers: { "Authorization": `Bearer ${$user.token}` } })
         .then((response) => {
           const chats = response.data;
           console.log("CHATS:");
@@ -111,7 +111,7 @@
       <div class="flex items-center">
         <Avatar size="1.8" type="word" word="H" />
 
-        <p class="text-sm font-semibold ml-2">{$user.user.name}</p>
+        <p class="text-sm font-semibold ml-2">{$user.name}</p>
 
         <!-- Chevron Icon -->
         <img class="ml-2" style="height: 1.2rem;" src="./icons/chevron-up.svg" alt="Chevron Down">

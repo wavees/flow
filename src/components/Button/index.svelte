@@ -6,16 +6,29 @@
   export let type = "normal";
 
   // Button-related parameters
+
+  // Backgrounds
+  export let background;
   export let hoveredBackground;
+
+  // Texts
+  export let textColor;
+  export let hoveredTextColor;
+
   export let classes;
 
   // Settings object for our buttons
   $: settings = {
-    // 
-    hoveredBackground,
+    // Backgrounds' settings
+    background: background,
+    hoveredBackground: hoveredBackground,
+
+    // Texts' settings
+    text: textColor,
+    hoveredText: hoveredTextColor,
 
     // Our custom classes
-    classes
+    classes: classes
   };
 </script>
 

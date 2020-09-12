@@ -91,16 +91,16 @@
 
     <!-- Buttons -->
     <div class="mt-8 text-white w-full flex flex-col items-center">
-      {#if $user.user.id != null}
+      {#if $user.uid != null}
         <!-- Go to my Chats button -->
         <Button on:click={(e) => {
           goto('/chats');
-        }} classes="mt-6" background="transparent" whiteOnHover={true}>
+        }} classes="mt-6">
           Go to my Chats
         </Button>
       { :else }
         <button>
-        
+
         </button>
       {/if}
     </div>

@@ -13,14 +13,12 @@ const cookies = Cookie();
 function createUserStore() {
   // Default object for the store
   let store = {
-    user: {
-      loaded: false,
+    loaded: false,
 
-      id: null,
-      token: null,
+    uid: null,
+    token: null,
 
-      name: null,
-    },
+    name: null,
 
     chats: {
       loaded: false,
@@ -36,6 +34,15 @@ function createUserStore() {
   // functions to manipulate this store.
   return {
     subscribe,
+
+    // clearStore
+    clearStore: () => {
+      update((object) => {
+        object = store;
+
+        return object;
+      });
+    },
 
     // clearStore
     // Clears this store
@@ -56,15 +63,15 @@ function createUserStore() {
     // in this store.
     updateUser: (user) => {
       update((object) => {
-        object.user.loaded = true;
+        object.loaded = true;
 
-        object.user.id           = user.uid;
-        object.user.token        = user.token;
+        object.uid           = user.uid;
+        object.token        = user.token;
         
-        object.user.name         = user.name;
+        object.name         = user.name;
 
-        object.user.avatar       = user.avatar;
-        object.user.creationDate = user.creationDate;
+        object.avatar       = user.avatar;
+        object.creationDate = user.creationDate;
 
         return object;
       });
@@ -86,6 +93,11 @@ function createUserStore() {
     addChat: (chat) => {
       update((object) => {
         object.chats.list.push(chat);
+        
+        // Let's update our loaded state (if needed)
+        if (object.chats.loaded != true) {
+          object.chats.loaded = true;
+        };
 
         return object;
       });
@@ -109,6 +121,29 @@ function createUserStore() {
       });
     },
 
+    // startService
+    // Small "service", that'll
+    // update our user's information
+    // whatever our token changes.
+    startService: () => {
+      // Update user whatevet our
+      // cookie changes.
+
+      let previousCookie;
+      // Cookie Change Listener
+      setInterval(() => {
+        let cookie = cookies.get("_account_token", { path: "/" });
+
+        if (previousCookie != cookie) {
+          console.log("UPDATE USER INFO");
+          console.log(cookie);
+
+          previousCookie = cookie;
+          user.checkAccount(cookie);
+        };
+      }, 1250);
+    },
+
     // checkUser
     // Function, that'l check our
     // user (or it will create
@@ -118,12 +153,27 @@ function createUserStore() {
         // Let's check our user.
         axios.get(`${api.current.url}/${api.current.version}/account`, { headers: { "Authorization": `Bearer ${token}` } })
         .then((response) => {
-          user.updateUser(response.data);
+          const data = response.data;
+          console.log("UPDATE USER");
 
+          // By the way, let's clear our store
+          // (if needed)
+          // const unsubsctibe = subscribe((object) => {
+          //   if (object.uid != data.uid) {
+          //     // Let's clear our store.
+          //     user.clearStore();
+          //     unsubscribe();
+          //   };
+          // });
+
+          user.updateUser(data);
+
+          // And now let's authorize in our websocket
+          // connection.
           socket.emit('authorize', { token });
         }).catch((error) => {
           console.log("ERROR");
-          console.log(error.response.data);
+          console.log(error);
         });
       } else {
         // Let's create our user.
@@ -135,6 +185,10 @@ function createUserStore() {
           
           axios.post(`${api.current.url}/${api.current.version}/account`, { name })
           .then((response) => {
+            // Firstly we need to clear our store
+            // (in case there are some old or junky information)
+            user.clearStore();
+
             // Let's now save user's token.
             cookies.set('_account_token', response.data.token.token, { expires: moment().add(1, 'year').toDate() });
   

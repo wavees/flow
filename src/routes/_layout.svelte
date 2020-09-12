@@ -1,37 +1,19 @@
 <script>
   // Let's import application's styles
   import Tailwind from "../styles/tailwind.svelte";
-	import socket from "../network/socket.js";
 
 	// import
 	import { fade } from "svelte/transition";
 	import { onMount } from "svelte";
 
-	import { Background } from "../components";
-
 	// Importing components
-	import {
-		Spinner
-	} from "darkmode-components/src/index";
-
-	// Cookie Manager
-	import Cookie from "cookie-universal";
-	const cookies = Cookie();
+	import { Background, Spinner } from "../components";
 
 	import { user } from "../config/stores/user.js";
 
-	let connectionProblems = null;
-
-	// onMount event
-	// Here we'll check our user.
+	// Let's start our user service
 	onMount(() => {
-		if (socket.connected) {
-			user.checkAccount(cookies.get('_account_token', { path: "/" }));
-		};
-	});
-
-	socket.on('connect', () => {
-		user.checkAccount(cookies.get('_account_token', { path: "/" }));
+		user.startService();
 	});
 </script>
 
@@ -40,7 +22,7 @@
 	<title>Wavees Flow</title>
 </svelte:head>
 
-{ #if $user.user.loaded } 
+{ #if $user.loaded } 
 	<main style="height: 100vh; overflow: hidden;">
 		<Background type="normal" classes="relative w-full h-full flex justify-center items-center bg-white">
 			<slot></slot>
