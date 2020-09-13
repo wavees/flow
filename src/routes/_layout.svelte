@@ -9,11 +9,12 @@
 	// Importing components
 	import { Background, Spinner } from "../components";
 
-	import { user } from "../config/stores/user.js";
+	import UserManager from "../application/managers/UserManager.js";
+	import ErrorManager from "../application/managers/ErrorManager.js";
 
 	// Let's start our user service
 	onMount(() => {
-		user.startService();
+		UserManager.startService();
 	});
 </script>
 
@@ -22,11 +23,19 @@
 	<title>Wavees Flow</title>
 </svelte:head>
 
-{ #if $user.loaded } 
+{ #if $UserManager.loaded } 
 	<main style="height: 100vh; overflow: hidden;">
-		<Background type="normal" classes="relative w-full h-full flex justify-center items-center bg-white">
-			<slot></slot>
-		</Background>
+
+		<!-- And now let's check if we have any errors -->
+		{ #if $ErrorManager.majorError }
+			<Background type="error" classes="relative w-full h-full flex justify-center items-center bg-white">
+				<slot></slot>
+			</Background>
+		{ :else }
+			<Background type="normal" classes="relative w-full h-full flex justify-center items-center bg-white">
+				<slot></slot>
+			</Background>
+		{ /if }
 	</main>
 { :else }
 	<div class="absolute w-full h-screen flex justify-center items-center bg-white">

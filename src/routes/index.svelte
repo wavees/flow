@@ -2,7 +2,7 @@
   // Let's now import some modules
   // and components.
   import socket from "../network/socket.js";
-  import { user } from "../config/stores/user.js";
+  import UserManager from "../application/managers/UserManager.js";
 
   import backgrounds from "../config/themes/backgrounds.js";
 
@@ -91,7 +91,7 @@
 
     <!-- Buttons -->
     <div class="mt-8 text-white w-full flex flex-col items-center">
-      {#if $user.uid != null}
+      {#if $UserManager.uid != null}
         <!-- Go to my Chats button -->
         <Button on:click={(e) => {
           goto('/chats');

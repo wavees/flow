@@ -1,14 +1,19 @@
 // import
 import { writable } from "svelte/store";
-import axios from 'axios';
 
-import socket from "../../network/socket.js";
-
-import moment from "moment";
-import api from "../application/api";
-
+// Cookie Manager
 import Cookie from "cookie-universal";
 const cookies = Cookie();
+
+// Let's now import some needed
+// actions
+
+// @action user/retrieve
+import UserRetrieve from "../actions/user/retrieve.js";
+
+// @action user/authorize
+
+// @action user/register
 
 function createUserStore() {
   // Default object for the store
@@ -129,16 +134,16 @@ function createUserStore() {
       // Update user whatevet our
       // cookie changes.
 
-      let previousCookie;
+      let previousCookie = 0;
       // Cookie Change Listener
       setInterval(() => {
         let cookie = cookies.get("_account_token", { path: "/" });
 
         if (previousCookie != cookie) {
           previousCookie = cookie;
-          user.checkAccount(cookie);
+          _store.checkAccount(cookie);
         };
-      }, 10);
+      }, 150);
     },
 
     // checkUser
@@ -147,70 +152,53 @@ function createUserStore() {
     // new user);
     checkAccount: (token) => {
       if (token) {
-        // Let's check our user.
-        axios.get(`${api.current.url}/${api.current.version}/account`, { headers: { "Authorization": `Bearer ${token}` } })
-        .then((response) => {
-          const data = response.data;
-          console.log("UPDATE USER");
-
-          // By the way, let's clear our store
-          // (if needed)
-          const unsubscribe = subscribe((object) => {
-            if (object.uid != data.uid) {
-              // Let's clear our store.
-              user.clearStore();
-              unsubscribe();
-            };
-          });
-
-          user.updateUser(data);
-
-          // And now let's authorize in our websocket
-          // connection.
-          socket.emit('authorize', { token });
+        // Let's now try to retrieve our user
+        // information.
+        UserRetrieve(token).then((data) => {
+          console.log(data);
         }).catch((error) => {
-          console.log("ERROR");
+          // Our user exists or no?
           console.log(error);
         });
       } else {
         // Let's create our user.
         
-        // But Firstly let's get random user's username
-        axios.get('https://random-word-api.herokuapp.com/word?number=1&swear=0')
-        .then((response) => {
-          let name = response.data.map((string) => string.charAt(0).toUpperCase() + string.slice(1)).join(' ');
+        // // But Firstly let's get random user's username
+        // axios.get('https://random-word-api.herokuapp.com/word?number=1&swear=0')
+        // .then((response) => {
+        //   let name = response.data.map((string) => string.charAt(0).toUpperCase() + string.slice(1)).join(' ');
           
-          axios.post(`${api.current.url}/${api.current.version}/account`, { name })
-          .then((response) => {
-            // Firstly we need to clear our store
-            // (in case there are some old or junky information)
-            user.clearStore();
+        //   axios.post(`${api.current.url}/${api.current.version}/account`, { name })
+        //   .then((response) => {
+        //     // Firstly we need to clear our store
+        //     // (in case there are some old or junky information)
+        //     user.clearStore();
 
-            // Let's now save user's token.
-            cookies.set('_account_token', response.data.token.token, { expires: moment().add(1, 'year').toDate() });
+        //     // Let's now save user's token.
+        //     cookies.set('_account_token', response.data.token.token, { expires: moment().add(1, 'year').toDate() });
   
-            user.updateUser({
-              token: response.data.token.token,
+        //     user.updateUser({
+        //       token: response.data.token.token,
   
-              // Another user information...
-              name: response.data.user.name,
-              uid: response.data.user.uid,
-              avatar: response.data.user.avatar,
-              creationDate: response.data.user.creationDate
-            });
+        //       // Another user information...
+        //       name: response.data.user.name,
+        //       uid: response.data.user.uid,
+        //       avatar: response.data.user.avatar,
+        //       creationDate: response.data.user.creationDate
+        //     });
 
-            // And let's authorize in our socket.
-            socket.emit('authorize', { token: response.data.token.token });
-          }).catch((error) => {
-            console.log("ERROR WHILE CREATING USER");
-            console.log(error.response.data);
-          });
-        });
+        //     // And let's authorize in our socket.
+        //     socket.emit('authorize', { token: response.data.token.token });
+        //   }).catch((error) => {
+        //     console.log("ERROR WHILE CREATING USER");
+        //     console.log(error.response.data);
+        //   });
+        // });
       };
     }
   }
 };
 
-const user = createUserStore();
+const _store = createUserStore();
 
-export { user };
+export default _store;
