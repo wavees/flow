@@ -23,9 +23,9 @@ function createErrorManagerStore() {
     // check it's type and
     // to check if it's
     // a major or minor error.
-    log: (error) => {
-      console.log("ERROR:");
-      console.log(error);
+    log: (object) => {
+      console.log("LOGGED ERROR");
+      console.log(object);
     }
   };
 };

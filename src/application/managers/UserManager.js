@@ -1,6 +1,18 @@
 // import
 import { writable } from "svelte/store";
 
+// axios
+import axios from "axios";
+
+// moment.js
+import moment from "moment";
+
+// Socket Manager
+import socket from "../../network/socket";
+
+// Error Manager
+import ErrorManager from "./ErrorManager.js";
+
 // Cookie Manager
 import Cookie from "cookie-universal";
 const cookies = Cookie();
@@ -11,9 +23,8 @@ const cookies = Cookie();
 // @action user/retrieve
 import UserRetrieve from "../actions/user/retrieve.js";
 
-// @action user/authorize
-
 // @action user/register
+import UserCreate from "../actions/user/create.js";
 
 function createUserStore() {
   // Default object for the store
@@ -151,50 +162,62 @@ function createUserStore() {
     // user (or it will create
     // new user);
     checkAccount: (token) => {
-      if (token) {
-        // Let's now try to retrieve our user
-        // information.
-        UserRetrieve(token).then((data) => {
-          console.log(data);
-        }).catch((error) => {
-          // Our user exists or no?
-          console.log(error);
-        });
-      } else {
-        // Let's create our user.
-        
-        // // But Firstly let's get random user's username
-        // axios.get('https://random-word-api.herokuapp.com/word?number=1&swear=0')
-        // .then((response) => {
-        //   let name = response.data.map((string) => string.charAt(0).toUpperCase() + string.slice(1)).join(' ');
-          
-        //   axios.post(`${api.current.url}/${api.current.version}/account`, { name })
-        //   .then((response) => {
-        //     // Firstly we need to clear our store
-        //     // (in case there are some old or junky information)
-        //     user.clearStore();
+      // Let's now try to retrieve our user
+      // information.
+      UserRetrieve(token).then((response) => {
+        // Let's now update our user information.
+        _store.updateUser(response);
+      }).catch((response) => {
+        console.log("RESPONSE:");
+        console.log(response);
 
-        //     // Let's now save user's token.
-        //     cookies.set('_account_token', response.data.token.token, { expires: moment().add(1, 'year').toDate() });
-  
-        //     user.updateUser({
-        //       token: response.data.token.token,
-  
-        //       // Another user information...
-        //       name: response.data.user.name,
-        //       uid: response.data.user.uid,
-        //       avatar: response.data.user.avatar,
-        //       creationDate: response.data.user.creationDate
-        //     });
+        // Our user exists or no?
+        if (response.error == "InvalidToken") {
+          console.log("YEAH");
+          // So now we need to create new user account...
+          axios.get('https://random-word-api.herokuapp.com/word?number=1&swear=0')
+          .then((response) => {
+            let name = response.data.map((string) => string.charAt(0).toUpperCase() + string.slice(1)).join(' ');
 
-        //     // And let's authorize in our socket.
-        //     socket.emit('authorize', { token: response.data.token.token });
-        //   }).catch((error) => {
-        //     console.log("ERROR WHILE CREATING USER");
-        //     console.log(error.response.data);
-        //   });
-        // });
-      };
+            console.log("CREATE WITH NAME:");
+            console.log(name);
+
+            UserCreate({ name })
+            .then((response) => {
+
+              const token = response.token;
+              const user  = response.user;
+
+              // Let's firstly update our
+              // _account_token cookie
+              cookies.set('_account_token', token.token, { expires: moment().add(1, 'year').toDate() });
+
+              console.log("USER && TOKEN:");
+              console.log(token);
+              console.log(user);
+
+              user.token = token.token;
+              // And now let's update our user.
+              _store.updateUser(user);
+
+              // Now let's authorize in our SocketManager.
+              // WIP: Refactor this
+              socket.emit('authorize', { token: token.token });
+            }).catch((error) => {
+              // Let's now log this error;
+              ErrorManager.log({ error, zone: "user/registration" });
+            });
+          }).catch((error) => {
+            // Let's log this error to our Error Manager.
+            ErrorManager.log({ error, zone: "user/registration" });
+          });
+        } else {
+          console.log("NO");
+
+          // Let's try to check this user again.
+          _store.checkAccount(token);
+        };
+      });
     }
   }
 };
