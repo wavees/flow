@@ -1,17 +1,24 @@
 <script>
   // Let's now import some modules and
   // components.
-  import { user } from "../../config/stores/user.js";
+  import UserManager from "../../application/managers/UserManager.js";
+  import ChatsManager from "../../application/managers/ChatsManager.js";
+  import ErrorManager from "../../application/managers/ErrorManager.js";
 
   import { fade, slide } from 'svelte/transition';
 
+  // Importing components
   import Notifications from "../../components/Notifications.svelte";
   import NetworkStatus from "../../components/NetworkStatus.svelte";
 
-  import socket from "../../network/socket.js";
+  import backgrounds from "../../config/themes/backgrounds.js";
 
-  import axios from "axios";
-  import api from "../../config/application/api";
+  // Let's now import some actions 
+
+  // @action GetChats
+  import GetChats from "../../application/actions/chats/retrieve.js";
+
+  import socket from "../../network/socket.js";
 
   import { Avatar, Spinner } from "darkmode-components/src/index";
 
@@ -22,31 +29,19 @@
 
   let loaded;
 
-  let backgrounds = [
-    "background: linear-gradient(to right, #00b4db, #0083b0);",
-    "background: linear-gradient(to right, #ff9966, #ff5e62);",
-    "background: linear-gradient(to right, #7f00ff, #e100ff);",
-    "background: linear-gradient(to right, #4568dc, #b06ab3);"
-  ];
-
   onMount(() => {
     setTimeout(() => {
       loaded = true;
 
       // Let's update our chats
-      if (!$user.chats.loaded) {
-        user.clearChats();
+      if (!$ChatsManager.loaded) {
+        ChatsManager.clearChats();
         // And now let's load our chats.
-        axios.get(`${api.current.url}/${api.current.version}/chats`, { headers: { "Authorization": `Bearer ${$user.token}` } })
-        .then((response) => {
-          const chats = response.data;
-          console.log("CHATS:");
-          console.log(chats);
-
-          user.updateChats(chats)
+        GetChats($UserManager.token)
+        .then((chats) => {
+          ChatsManager.updateChats(chats);
         }).catch((error) => {
-          console.log("ERROR WHILE LOADING CHATS LIST");
-          console.log(error.response.data);
+          ErrorManager.log({ error, zone: "user/getChats" });
         });
       };
     }, 50);
@@ -55,7 +50,7 @@
   socket.on('event.chat/created', (data) => {
     // Let's now add this chat to our
     // chat list.
-    user.addChat(data.response.chat);
+    ChatsManager.addChat(data.response.chat);
   });
 </script>
 
@@ -80,16 +75,16 @@
     <div style="z-index: 1;" class="py-2 flex flex-col flex-grow justify-center px-4 md:px-6">
       <!-- Chat Entry -->
 
-      {#if !$user.chats.loaded}
+      {#if !$ChatsManager.loaded}
         <!-- Chats Loading -->
         <div style="min-height: 80vh;" class="w-full flex flex-col justify-center items-center">
           <Spinner size="15" />
         </div>
       { :else }
-        {#if $user.chats.list.length > 0}
+        {#if $ChatsManager.list.length > 0}
           <!-- content here -->
           <div class="pb-12">
-            {#each $user.chats.list as chat}
+            {#each $ChatsManager.list as chat}
               <ChatPanel chat={chat} />
             {/each}
           </div>
@@ -111,7 +106,7 @@
       <div class="flex items-center">
         <Avatar size="1.8" type="word" word="H" />
 
-        <p class="text-sm font-semibold ml-2">{$user.name}</p>
+        <p class="text-sm font-semibold ml-2">{$UserManager.name}</p>
 
         <!-- Chevron Icon -->
         <img class="ml-2" style="height: 1.2rem;" src="./icons/chevron-up.svg" alt="Chevron Down">

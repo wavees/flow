@@ -1,12 +1,10 @@
 import axios from "axios";
-import api from "../../configs/api.js";
 
-const _function = (token) => {
+const _function = (length = 2) => {
   return new Promise((resolve, reject) => {
-    // And now let's make request to our API
-    axios.get(`${api.current.url}/${api.current.version}/chats`, { headers: { "Authorization": `Bearer ${token}` } })
+    axios.get(`https://random-word-api.herokuapp.com/word?number=${length}&swear=0`)
     .then((response) => {
-      resolve(response.data)
+      resolve(response.data);
     }).catch((error) => {
       const response = error.response;
       

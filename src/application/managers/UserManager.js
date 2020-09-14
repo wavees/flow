@@ -1,9 +1,6 @@
 // import
 import { writable } from "svelte/store";
 
-// axios
-import axios from "axios";
-
 // moment.js
 import moment from "moment";
 
@@ -26,6 +23,9 @@ import UserRetrieve from "../actions/user/retrieve.js";
 // @action user/register
 import UserCreate from "../actions/user/create.js";
 
+// @action getRandomWords
+import GetRandomWords from "../actions/getRandomWords.js";
+
 function createUserStore() {
   // Default object for the store
   let store = {
@@ -35,12 +35,6 @@ function createUserStore() {
     token: null,
 
     name: null,
-
-    chats: {
-      loaded: false,
-
-      list: []
-    }
   };
 
   // Get some functions from writable store...
@@ -55,19 +49,6 @@ function createUserStore() {
     clearStore: () => {
       update((object) => {
         object = store;
-
-        return object;
-      });
-    },
-
-    // clearStore
-    // Clears this store
-    clearChats: () => {
-      update((object) => {
-        object.chats = {
-          loaded: false,
-          list: []
-        };
 
         return object;
       });
@@ -88,50 +69,6 @@ function createUserStore() {
 
         object.avatar       = user.avatar;
         object.creationDate = user.creationDate;
-
-        return object;
-      });
-    },
-
-    // updateChats
-    // Function, that'll update our
-    // chats list
-    updateChats: (chats) => {
-      update((object) => {
-        object.chats.loaded = true;
-
-        object.chats.list = chats;
-        
-        return object;
-      });
-    },
-
-    addChat: (chat) => {
-      update((object) => {
-        object.chats.list.push(chat);
-        
-        // Let's update our loaded state (if needed)
-        if (object.chats.loaded != true) {
-          object.chats.loaded = true;
-        };
-
-        return object;
-      });
-    },
-
-    changeChat: (cid, chat) => {
-      update((object) => {
-        let chats = object.chats.list;
-
-        // And now let's try to update this
-        // chat info in our chats array...
-        let itemIndex = chats.indexOf(chats.find(x => x.id == cid));
-
-        if (itemIndex !== -1) {
-          chats[itemIndex] = chat;
-        };
-
-        object.chats.list = chats;
 
         return object;
       });
@@ -168,19 +105,12 @@ function createUserStore() {
         // Let's now update our user information.
         _store.updateUser(response);
       }).catch((response) => {
-        console.log("RESPONSE:");
-        console.log(response);
-
         // Our user exists or no?
         if (response.error == "InvalidToken") {
-          console.log("YEAH");
           // So now we need to create new user account...
-          axios.get('https://random-word-api.herokuapp.com/word?number=1&swear=0')
+          GetRandomWords(1)
           .then((response) => {
-            let name = response.data.map((string) => string.charAt(0).toUpperCase() + string.slice(1)).join(' ');
-
-            console.log("CREATE WITH NAME:");
-            console.log(name);
+            let name = response.map((string) => string.charAt(0).toUpperCase() + string.slice(1)).join(' ');
 
             UserCreate({ name })
             .then((response) => {
@@ -191,10 +121,6 @@ function createUserStore() {
               // Let's firstly update our
               // _account_token cookie
               cookies.set('_account_token', token.token, { expires: moment().add(1, 'year').toDate() });
-
-              console.log("USER && TOKEN:");
-              console.log(token);
-              console.log(user);
 
               user.token = token.token;
               // And now let's update our user.
@@ -212,8 +138,6 @@ function createUserStore() {
             ErrorManager.log({ error, zone: "user/registration" });
           });
         } else {
-          console.log("NO");
-
           // Let's try to check this user again.
           _store.checkAccount(token);
         };
