@@ -11,5 +11,11 @@
       "title": "Not Found",
       "subtitle": "Requested page not found"
     }
+  },
+
+  "application": {
+    "chats": {
+      "title": "My Chats"
+    }
   }
 }

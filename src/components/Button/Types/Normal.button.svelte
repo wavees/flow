@@ -1,6 +1,9 @@
 <script>
   // Importing components and declaring
   // some needed variables
+  import { createEventDispatcher } from "svelte";
+  const dispatch = createEventDispatcher();
+
   let hovered = false;
 
   // Let's now export our global
@@ -9,12 +12,16 @@
     classes: "",
 
     // Backgrounds
-    background: "#fff",
-    hoveredBackground: "#000",
+    background: {
+      default: "#fff",
+      hovered: "#000"
+    },
 
     // Text colors
-    text: "#000",
-    hoveredText: "#fff"
+    text: {
+      default: "#000",
+      hovered: "#fff"
+    }
   };
 </script>
 
@@ -42,18 +49,24 @@
 </style>
 
 <button
-  style="--bg-default: { settings.background || "#fff"  }; 
-      --bg-hovered: { settings.hoveredBackground || "#000" };
+  style="--bg-default: { settings.background.default || "#fff"  }; 
+      --bg-hovered: { settings.background.hovered || "#000" };
       
-      --text-default: { settings.text || "#000" };
-      --text-hovered: { settings.hoveredText || "#fff" };"
+      --text-default: { settings.text.default || "#000" };
+      --text-hovered: { settings.text.hovered || "#fff" };"
 
   class="{ settings.classes } rounded-lg px-4 py-2 { hovered ? `background-hovered text-hovered` : "background-default text-default" }" 
   
   on:click
   
-  on:mouseover={() => hovered = true} 
-  on:mouseout={() => hovered = false}>
+  on:mouseover={(e) => {
+    hovered = true;
+    dispatch("mouseover", e);
+  }} 
+  on:mouseout={(e) => {
+    hovered = false;
+    dispatch("mouseout", e);
+  }}>
 
   <slot></slot>
 </button>
