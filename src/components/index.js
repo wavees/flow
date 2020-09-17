@@ -11,5 +11,7 @@ import Background from "./Layout/Background/index.svelte";
 
 import Spinner from "./Layout/Spinner.svelte";
 
+import Avatar from "./Avatar/index.svelte";
+
 // And now let's export them.
-export { Button, Container, Heading, Text, Background, Spinner };
+export { Button, Container, Heading, Text, Background, Spinner, Avatar };
